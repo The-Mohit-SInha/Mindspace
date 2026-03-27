@@ -14,6 +14,8 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from '../components/ui/label';
 import { Alert, AlertDescription } from '../components/ui/alert';
 import { useAuth } from '../contexts/AuthContext';
+import { addWellnessEventToCalendar, isEventInCalendar } from '../../services/calendarService';
+import { toast } from 'sonner';
 
 export function Community() {
   const navigate = useNavigate();
@@ -45,6 +47,7 @@ export function Community() {
   const [myScheduledChats, setMyScheduledChats] = useState<Array<{ id: number; counselor: string; date: string; time: string; topic: string; status: string }>>([]);
   const [myRegisteredEvents, setMyRegisteredEvents] = useState<Array<{ id: number; title: string; date: string; time: string; location: string; type: string }>>([]);
   const [myEventProposals, setMyEventProposals] = useState<Array<{ id: number; title: string; orgName: string; date: string; status: string; submittedDate: string }>>([]);
+  const [eventInCalendar, setEventInCalendar] = useState<Record<number, boolean>>({});
 
   // Auto-fill forms with user data when user is authenticated
   useEffect(() => {
@@ -157,6 +160,55 @@ export function Community() {
       setEventProposalModal(false);
       setSuccessModal({ type: 'Event Proposal', message: 'Your event proposal has been submitted!' });
     }
+  };
+
+  // Add event to calendar
+  const handleAddToCalendar = async (eventId: number) => {
+    if (!isAuthenticated || !user) {
+      toast.error('Please sign in to add events to your calendar');
+      navigate('/sign-in');
+      return;
+    }
+
+    const event = upcomingEvents.find(e => e.id === eventId);
+    if (!event) return;
+
+    try {
+      // Parse date and time
+      const dateStr = new Date(event.date).toISOString().split('T')[0];
+      const timeStr = event.time.split(' - ')[0]; // Get start time
+      const time24 = convertTo24Hour(timeStr);
+
+      await addWellnessEventToCalendar(
+        user.id,
+        String(eventId),
+        event.title,
+        `Join us for this ${event.type.toLowerCase()} event at ${event.location}`,
+        dateStr,
+        time24,
+        event.location
+      );
+
+      setEventInCalendar({ ...eventInCalendar, [eventId]: true });
+    } catch (error) {
+      console.error('Failed to add to calendar:', error);
+    }
+  };
+
+  // Helper to convert 12-hour to 24-hour format
+  const convertTo24Hour = (time12h: string): string => {
+    const [time, modifier] = time12h.trim().split(' ');
+    let [hours, minutes] = time.split(':');
+    
+    if (hours === '12') {
+      hours = '00';
+    }
+    
+    if (modifier === 'PM') {
+      hours = String(parseInt(hours, 10) + 12);
+    }
+    
+    return `${hours.padStart(2, '0')}:${minutes || '00'}`;
   };
 
   const supportGroups = [
@@ -1176,8 +1228,26 @@ export function Community() {
                           >
                             Register for Event
                           </Button>
-                          <Button size="lg" variant="outline" className="flex-1">
-                            Add to Calendar
+                          <Button 
+                            size="lg" 
+                            variant="outline" 
+                            className="flex-1"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleAddToCalendar(selectedEvent);
+                            }}
+                          >
+                            {eventInCalendar[selectedEvent] ? (
+                              <>
+                                <CheckCircle className="w-5 h-5 mr-2" />
+                                Added to Calendar
+                              </>
+                            ) : (
+                              <>
+                                <Calendar className="w-5 h-5 mr-2" />
+                                Add to Calendar
+                              </>
+                            )}
                           </Button>
                         </div>
                       </CardContent>

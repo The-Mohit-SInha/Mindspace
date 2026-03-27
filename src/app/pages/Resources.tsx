@@ -68,34 +68,44 @@ export function Resources() {
       description: 'Understanding the symptoms and when to seek professional help.',
       readTime: '7 min read',
       tags: ['Depression', 'Mental Health', 'Support'],
-      content: `
-        <h2>What is Depression?</h2>
-        <p>Depression is more than just feeling sad or going through a rough patch. It's a serious mental health condition that requires understanding and medical care.</p>
-        
-        <h3>Common Signs and Symptoms</h3>
-        <ul>
-          <li>Persistent sad, anxious, or "empty" mood</li>
-          <li>Loss of interest in activities once enjoyed</li>
-          <li>Changes in appetite or weight</li>
-          <li>Sleep disturbances (insomnia or oversleeping)</li>
-          <li>Loss of energy or increased fatigue</li>
-          <li>Difficulty concentrating or making decisions</li>
-          <li>Feelings of worthlessness or excessive guilt</li>
-          <li>Thoughts of death or suicide</li>
-        </ul>
-        
-        <h3>Depression in College Students</h3>
-        <p>College can be particularly challenging with academic pressure, social adjustments, and financial stress. It's important to recognize that depression is not a sign of weakness or something you can just "snap out of."</p>
-        
-        <h3>When to Seek Help</h3>
-        <p>If you've experienced several of these symptoms for more than two weeks, it's important to reach out for help. Campus counseling services, your doctor, or a mental health professional can provide support and treatment options.</p>
-        
-        <h3>Treatment Options</h3>
-        <p><strong>Therapy:</strong> Cognitive-behavioral therapy (CBT) and other forms of counseling are highly effective.</p>
-        <p><strong>Medication:</strong> Antidepressants can help balance brain chemistry.</p>
-        <p><strong>Lifestyle Changes:</strong> Regular exercise, healthy diet, and good sleep habits support recovery.</p>
-        <p><strong>Support Groups:</strong> Connecting with others who understand can be invaluable.</p>
-      `,
+      sections: [
+        {
+          type: 'intro',
+          title: 'What is Depression?',
+          content: 'Depression is more than just feeling sad or going through a rough patch. It\'s a serious mental health condition that requires understanding and medical care. Left untreated, depression can impact every aspect of your life, from relationships to academic performance.',
+        },
+        {
+          type: 'symptoms',
+          title: 'Common Signs and Symptoms',
+          items: [
+            { label: 'Emotional symptoms', description: 'Persistent sad, anxious, or "empty" mood; feelings of worthlessness or excessive guilt' },
+            { label: 'Behavioral changes', description: 'Loss of interest in activities once enjoyed; withdrawal from friends and activities' },
+            { label: 'Physical symptoms', description: 'Changes in appetite or weight; sleep disturbances (insomnia or oversleeping); loss of energy or increased fatigue' },
+            { label: 'Cognitive difficulties', description: 'Difficulty concentrating, remembering, or making decisions; thoughts of death or suicide' },
+          ],
+        },
+        {
+          type: 'info',
+          title: 'Depression in College Students',
+          content: 'College can be particularly challenging with academic pressure, social adjustments, and financial stress. It\'s important to recognize that depression is not a sign of weakness or something you can just "snap out of." It\'s a real medical condition that responds to treatment.',
+        },
+        {
+          type: 'strategies',
+          title: 'Treatment Options',
+          strategies: [
+            { title: 'Therapy', description: 'Cognitive-behavioral therapy (CBT) and other forms of counseling are highly effective. A therapist can help you develop coping strategies and address underlying issues.' },
+            { title: 'Medication', description: 'Antidepressants can help balance brain chemistry. They often work best when combined with therapy.' },
+            { title: 'Lifestyle Changes', description: 'Regular exercise, healthy diet, and good sleep habits support recovery. Even small changes can make a significant difference.' },
+            { title: 'Support Groups', description: 'Connecting with others who understand can be invaluable. Many campuses offer peer support groups.' },
+          ],
+        },
+        {
+          type: 'callout',
+          variant: 'warning',
+          title: 'When to Seek Help',
+          content: 'If you\'ve experienced several of these symptoms for more than two weeks, it\'s important to reach out for help. Campus counseling services, your doctor, or a mental health professional can provide support and treatment options. If you\'re having thoughts of suicide, call 988 (Suicide & Crisis Lifeline) immediately.',
+        },
+      ],
     },
     {
       category: 'stress',
@@ -103,39 +113,40 @@ export function Resources() {
       description: 'Balance your academic workload while maintaining your wellbeing.',
       readTime: '6 min read',
       tags: ['Stress', 'Productivity', 'Balance'],
-      content: `
-        <h2>The Connection Between Time Management and Mental Health</h2>
-        <p>Poor time management often leads to increased stress, anxiety, and feeling overwhelmed. Learning to manage your time effectively is crucial for both academic success and mental wellbeing.</p>
-        
-        <h3>Common Time Management Challenges</h3>
-        <ul>
-          <li>Procrastination and last-minute cramming</li>
-          <li>Overcommitting to activities</li>
-          <li>Difficulty prioritizing tasks</li>
-          <li>Not allowing time for self-care</li>
-          <li>Poor sleep schedule</li>
-        </ul>
-        
-        <h3>Effective Strategies</h3>
-        <p><strong>Use a Planner</strong> - Whether digital or paper, having a centralized place to track assignments, appointments, and commitments is essential.</p>
-        
-        <p><strong>Priority Matrix</strong> - Categorize tasks as:</p>
-        <ul>
-          <li>Urgent and Important (do first)</li>
-          <li>Important but Not Urgent (schedule)</li>
-          <li>Urgent but Not Important (delegate if possible)</li>
-          <li>Neither Urgent nor Important (eliminate)</li>
-        </ul>
-        
-        <p><strong>Time Blocking</strong> - Dedicate specific time blocks for studying, classes, exercise, and relaxation.</p>
-        
-        <p><strong>The Pomodoro Technique</strong> - Work in focused 25-minute intervals with 5-minute breaks in between.</p>
-        
-        <p><strong>Learn to Say No</strong> - It's okay to decline commitments when your schedule is already full.</p>
-        
-        <h3>Building in Self-Care</h3>
-        <p>Schedule time for activities that restore your energy: exercise, hobbies, socializing, or simply relaxing. Self-care isn't selfish—it's necessary for maintaining your mental health and academic performance.</p>
-      `,
+      sections: [
+        {
+          type: 'intro',
+          title: 'The Connection Between Time Management and Mental Health',
+          content: 'Poor time management often leads to increased stress, anxiety, and feeling overwhelmed. Learning to manage your time effectively is crucial for both academic success and mental wellbeing. When you feel in control of your time, you feel more in control of your life.',
+        },
+        {
+          type: 'symptoms',
+          title: 'Common Time Management Challenges',
+          items: [
+            { label: 'Procrastination', description: 'Putting off tasks until the last minute, leading to unnecessary stress and cramming' },
+            { label: 'Overcommitment', description: 'Taking on too many activities and responsibilities, leaving no time for rest' },
+            { label: 'Poor prioritization', description: 'Difficulty identifying what tasks are most important and urgent' },
+            { label: 'Neglecting self-care', description: 'Not allowing time for exercise, relaxation, and social connections' },
+          ],
+        },
+        {
+          type: 'strategies',
+          title: 'Effective Time Management Strategies',
+          strategies: [
+            { title: 'Use a Planner', description: 'Whether digital or paper, having a centralized place to track assignments, appointments, and commitments is essential. Review it daily and weekly.' },
+            { title: 'Priority Matrix', description: 'Categorize tasks as: Urgent and Important (do first), Important but Not Urgent (schedule), Urgent but Not Important (delegate if possible), Neither Urgent nor Important (eliminate).' },
+            { title: 'Time Blocking', description: 'Dedicate specific time blocks for studying, classes, exercise, and relaxation. Treat these blocks as non-negotiable appointments.' },
+            { title: 'The Pomodoro Technique', description: 'Work in focused 25-minute intervals with 5-minute breaks in between. This maintains focus while preventing burnout.' },
+            { title: 'Learn to Say No', description: 'It\'s okay to decline commitments when your schedule is already full. Protecting your time protects your mental health.' },
+          ],
+        },
+        {
+          type: 'callout',
+          variant: 'success',
+          title: 'Building in Self-Care',
+          content: 'Schedule time for activities that restore your energy: exercise, hobbies, socializing, or simply relaxing. Self-care isn\'t selfish—it\'s necessary for maintaining your mental health and academic performance. Treat self-care time with the same importance as class time.',
+        },
+      ],
     },
     {
       category: 'wellbeing',
@@ -143,37 +154,45 @@ export function Resources() {
       description: 'How to create and maintain meaningful relationships in college.',
       readTime: '8 min read',
       tags: ['Social', 'Wellbeing', 'Relationships'],
-      content: `
-        <h2>The Importance of Social Connections</h2>
-        <p>Strong social connections are fundamental to mental health and wellbeing. Research shows that meaningful relationships can reduce stress, increase happiness, and even improve physical health.</p>
-        
-        <h3>Challenges in College</h3>
-        <p>College presents unique social challenges: leaving old friends behind, meeting new people, balancing social life with academics, and navigating diverse social environments.</p>
-        
-        <h3>Building New Connections</h3>
-        <p><strong>Join Clubs and Organizations</strong> - Find groups that align with your interests. Shared activities provide natural conversation starters.</p>
-        
-        <p><strong>Attend Campus Events</strong> - Take advantage of orientation activities, guest lectures, and social gatherings.</p>
-        
-        <p><strong>Study Groups</strong> - Form study groups in your classes. Academic collaboration can lead to friendships.</p>
-        
-        <p><strong>Be Yourself</strong> - Authentic connections are more fulfilling than trying to be someone you're not.</p>
-        
-        <h3>Maintaining Relationships</h3>
-        <ul>
-          <li>Make time for friends despite busy schedules</li>
-          <li>Practice active listening</li>
-          <li>Show appreciation and gratitude</li>
-          <li>Be there during difficult times</li>
-          <li>Communicate openly and honestly</li>
-        </ul>
-        
-        <h3>Quality Over Quantity</h3>
-        <p>You don't need dozens of friends. A few close, supportive relationships are more valuable than many superficial ones. Focus on building deep connections with people who genuinely care about you.</p>
-        
-        <h3>When Social Anxiety Gets in the Way</h3>
-        <p>If social anxiety is preventing you from making connections, start small. Begin with one-on-one interactions, practice conversation skills, and consider seeking support from campus counseling services.</p>
-      `,
+      sections: [
+        {
+          type: 'intro',
+          title: 'The Importance of Social Connections',
+          content: 'Strong social connections are fundamental to mental health and wellbeing. Research shows that meaningful relationships can reduce stress, increase happiness, and even improve physical health. College is an ideal time to build lasting friendships and develop social skills.',
+        },
+        {
+          type: 'symptoms',
+          title: 'Social Challenges in College',
+          items: [
+            { label: 'Transition difficulties', description: 'Leaving old friends behind and starting over in a new environment' },
+            { label: 'Time management', description: 'Balancing social life with demanding academic schedules' },
+            { label: 'Diversity navigation', description: 'Meeting people from different backgrounds and perspectives' },
+            { label: 'Social anxiety', description: 'Feeling nervous or uncomfortable in social situations' },
+          ],
+        },
+        {
+          type: 'strategies',
+          title: 'Building New Connections',
+          strategies: [
+            { title: 'Join Clubs and Organizations', description: 'Find groups that align with your interests. Shared activities provide natural conversation starters and regular opportunities to connect.' },
+            { title: 'Attend Campus Events', description: 'Take advantage of orientation activities, guest lectures, and social gatherings. Even if you go alone, you\'ll meet others doing the same.' },
+            { title: 'Form Study Groups', description: 'Academic collaboration in your classes can lead to friendships. You\'re already working toward common goals.' },
+            { title: 'Be Authentic', description: 'Be yourself rather than trying to fit a certain image. Authentic connections are more fulfilling and sustainable.' },
+            { title: 'Take Initiative', description: 'Suggest grabbing coffee, studying together, or attending events. Many people are waiting for someone else to make the first move.' },
+          ],
+        },
+        {
+          type: 'info',
+          title: 'Maintaining Relationships',
+          content: 'Once you\'ve made connections, nurture them by making time for friends despite busy schedules, practicing active listening, showing appreciation and gratitude, being there during difficult times, and communicating openly and honestly.',
+        },
+        {
+          type: 'callout',
+          variant: 'info',
+          title: 'Quality Over Quantity',
+          content: 'You don\'t need dozens of friends. A few close, supportive relationships are more valuable than many superficial ones. Focus on building deep connections with people who genuinely care about you. If social anxiety is preventing you from making connections, start small with one-on-one interactions and consider seeking support from campus counseling services.',
+        },
+      ],
     },
     {
       category: 'sleep',
@@ -181,53 +200,41 @@ export function Resources() {
       description: 'Improving your sleep quality for better mental health and performance.',
       readTime: '5 min read',
       tags: ['Sleep', 'Health', 'Routine'],
-      content: `
-        <h2>Why Sleep Matters</h2>
-        <p>Sleep is essential for cognitive function, emotional regulation, and physical health. College students often sacrifice sleep, but this can seriously impact academic performance, mood, and overall wellbeing.</p>
-        
-        <h3>The Consequences of Sleep Deprivation</h3>
-        <ul>
-          <li>Difficulty concentrating and learning</li>
-          <li>Impaired memory consolidation</li>
-          <li>Increased anxiety and depression</li>
-          <li>Weakened immune system</li>
-          <li>Poor decision-making</li>
-        </ul>
-        
-        <h3>Sleep Hygiene Practices</h3>
-        <p><strong>Consistent Schedule</strong> - Go to bed and wake up at the same time every day, even on weekends.</p>
-        
-        <p><strong>Create a Bedtime Routine</strong> - Develop a relaxing pre-sleep routine: reading, gentle stretching, or meditation.</p>
-        
-        <p><strong>Optimize Your Environment</strong></p>
-        <ul>
-          <li>Keep your room cool, dark, and quiet</li>
-          <li>Use comfortable bedding</li>
-          <li>Remove or cover electronic displays</li>
-        </ul>
-        
-        <p><strong>Limit Screen Time</strong> - Avoid screens 30-60 minutes before bed. Blue light interferes with melatonin production.</p>
-        
-        <p><strong>Watch Your Intake</strong></p>
-        <ul>
-          <li>Avoid caffeine 6+ hours before bed</li>
-          <li>Limit alcohol (it disrupts sleep quality)</li>
-          <li>Don't eat heavy meals close to bedtime</li>
-        </ul>
-        
-        <p><strong>Exercise Regularly</strong> - Regular physical activity promotes better sleep, but avoid intense exercise close to bedtime.</p>
-        
-        <h3>Managing All-Nighters</h3>
-        <p>While sometimes unavoidable, all-nighters should be rare exceptions, not regular occurrences. When you must stay up late, try to:</p>
-        <ul>
-          <li>Take short power naps (20 minutes) if needed</li>
-          <li>Stay hydrated</li>
-          <li>Recovery properly with extra sleep the following night</li>
-        </ul>
-        
-        <h3>When to Seek Help</h3>
-        <p>If you consistently have trouble falling asleep, staying asleep, or feel unrested despite adequate sleep time, consult a healthcare provider. You may have a sleep disorder that requires treatment.</p>
-      `,
+      sections: [
+        {
+          type: 'intro',
+          title: 'Why Sleep Matters',
+          content: 'Sleep is essential for cognitive function, emotional regulation, and physical health. College students often sacrifice sleep for studying, socializing, or work, but this can seriously impact academic performance, mood, and overall wellbeing. Quality sleep is one of the most important factors in mental health.',
+        },
+        {
+          type: 'symptoms',
+          title: 'The Consequences of Sleep Deprivation',
+          items: [
+            { label: 'Cognitive impairment', description: 'Difficulty concentrating, learning new information, and impaired memory consolidation' },
+            { label: 'Emotional dysregulation', description: 'Increased anxiety, depression, irritability, and mood swings' },
+            { label: 'Physical health issues', description: 'Weakened immune system, increased risk of illness, weight gain' },
+            { label: 'Poor decision-making', description: 'Impaired judgment and increased risk-taking behavior' },
+          ],
+        },
+        {
+          type: 'strategies',
+          title: 'Sleep Hygiene Practices',
+          strategies: [
+            { title: 'Consistent Schedule', description: 'Go to bed and wake up at the same time every day, even on weekends. This regulates your body\'s internal clock.' },
+            { title: 'Create a Bedtime Routine', description: 'Develop a relaxing pre-sleep routine: reading, gentle stretching, or meditation. This signals your body it\'s time to wind down.' },
+            { title: 'Optimize Your Environment', description: 'Keep your room cool (65-68°F), dark, and quiet. Use comfortable bedding and remove or cover electronic displays.' },
+            { title: 'Limit Screen Time', description: 'Avoid screens 30-60 minutes before bed. Blue light interferes with melatonin production. Use blue light filters if you must use devices.' },
+            { title: 'Watch Your Intake', description: 'Avoid caffeine 6+ hours before bed, limit alcohol (it disrupts sleep quality), and don\'t eat heavy meals close to bedtime.' },
+            { title: 'Exercise Regularly', description: 'Regular physical activity promotes better sleep, but avoid intense exercise close to bedtime as it can be stimulating.' },
+          ],
+        },
+        {
+          type: 'callout',
+          variant: 'warning',
+          title: 'When to Seek Help',
+          content: 'If you consistently have trouble falling asleep, staying asleep, or feel unrested despite adequate sleep time, consult a healthcare provider. You may have a sleep disorder like insomnia or sleep apnea that requires treatment. Don\'t suffer in silence—quality sleep is essential for your wellbeing.',
+        },
+      ],
     },
     {
       category: 'anxiety',
@@ -235,52 +242,40 @@ export function Resources() {
       description: 'Simple mindfulness exercises you can practice anywhere.',
       readTime: '4 min read',
       tags: ['Anxiety', 'Mindfulness', 'Techniques'],
-      content: `
-        <h2>What is Mindfulness?</h2>
-        <p>Mindfulness is the practice of being present and fully engaged in the current moment, without judgment. It's a powerful tool for managing anxiety, stress, and improving overall mental wellbeing.</p>
-        
-        <h3>Benefits of Mindfulness</h3>
-        <ul>
-          <li>Reduced anxiety and stress</li>
-          <li>Improved focus and concentration</li>
-          <li>Better emotional regulation</li>
-          <li>Enhanced self-awareness</li>
-          <li>Improved sleep quality</li>
-        </ul>
-        
-        <h3>Simple Mindfulness Exercises</h3>
-        
-        <p><strong>Mindful Breathing</strong></p>
-        <p>Focus your attention on your breath. Notice the sensation of air entering and leaving your nostrils. When your mind wanders, gently bring it back to your breath. Practice for 5-10 minutes daily.</p>
-        
-        <p><strong>Body Scan Meditation</strong></p>
-        <p>Lie down comfortably. Starting at your toes, slowly bring attention to each part of your body, noticing any sensations without trying to change them. Move gradually up to the top of your head.</p>
-        
-        <p><strong>Mindful Walking</strong></p>
-        <p>As you walk, pay attention to the sensation of your feet touching the ground, the movement of your body, and the environment around you. Walk slowly and deliberately.</p>
-        
-        <p><strong>5-4-3-2-1 Grounding Technique</strong></p>
-        <p>Notice:</p>
-        <ul>
-          <li>5 things you can see</li>
-          <li>4 things you can touch</li>
-          <li>3 things you can hear</li>
-          <li>2 things you can smell</li>
-          <li>1 thing you can taste</li>
-        </ul>
-        
-        <h3>Tips for Getting Started</h3>
-        <ul>
-          <li>Start with just 5 minutes a day</li>
-          <li>Find a quiet, comfortable space</li>
-          <li>Be patient with yourself—mind wandering is normal</li>
-          <li>Use guided meditation apps if helpful</li>
-          <li>Practice regularly for best results</li>
-        </ul>
-        
-        <h3>Incorporating Mindfulness into Daily Life</h3>
-        <p>You don't need to meditate formally to be mindful. Practice mindfulness while eating, showering, or doing everyday activities by simply paying full attention to the experience.</p>
-      `,
+      sections: [
+        {
+          type: 'intro',
+          title: 'What is Mindfulness?',
+          content: 'Mindfulness is the practice of being present and fully engaged in the current moment, without judgment. It\'s a powerful tool for managing anxiety, stress, and improving overall mental wellbeing. The best part? You can practice it anywhere, anytime.',
+        },
+        {
+          type: 'symptoms',
+          title: 'Benefits of Mindfulness',
+          items: [
+            { label: 'Stress reduction', description: 'Lower levels of cortisol and reduced anxiety symptoms' },
+            { label: 'Improved focus', description: 'Better concentration and attention span for academic work' },
+            { label: 'Emotional regulation', description: 'Greater ability to manage difficult emotions and reactions' },
+            { label: 'Enhanced wellbeing', description: 'Improved self-awareness, sleep quality, and overall life satisfaction' },
+          ],
+        },
+        {
+          type: 'strategies',
+          title: 'Simple Mindfulness Exercises',
+          strategies: [
+            { title: 'Mindful Breathing', description: 'Focus your attention on your breath. Notice the sensation of air entering and leaving your nostrils. When your mind wanders (and it will), gently bring it back to your breath. Practice for 5-10 minutes daily.' },
+            { title: 'Body Scan Meditation', description: 'Lie down comfortably. Starting at your toes, slowly bring attention to each part of your body, noticing any sensations without trying to change them. Move gradually up to the top of your head.' },
+            { title: 'Mindful Walking', description: 'As you walk, pay attention to the sensation of your feet touching the ground, the movement of your body, and the environment around you. Walk slowly and deliberately.' },
+            { title: '5-4-3-2-1 Grounding', description: 'Notice: 5 things you can see, 4 things you can touch, 3 things you can hear, 2 things you can smell, 1 thing you can taste. Perfect for managing anxiety.' },
+            { title: 'Mindful Daily Activities', description: 'Practice mindfulness while eating, showering, or doing everyday activities by simply paying full attention to the experience. No special time or place needed.' },
+          ],
+        },
+        {
+          type: 'callout',
+          variant: 'success',
+          title: 'Tips for Getting Started',
+          content: 'Start with just 5 minutes a day. Find a quiet, comfortable space. Be patient with yourself—mind wandering is completely normal and expected. Use guided meditation apps if helpful. Practice regularly for best results. Remember, mindfulness is a skill that improves with practice.',
+        },
+      ],
     },
   ];
 
@@ -546,6 +541,15 @@ export function Resources() {
                           </Card>
                         ))}
                       </div>
+                    </div>
+                  );
+                }
+
+                if (section.type === 'info') {
+                  return (
+                    <div key={index}>
+                      <h3 className="text-2xl mb-4 text-gray-900">{section.title}</h3>
+                      <p className="text-lg text-gray-700 leading-relaxed">{section.content}</p>
                     </div>
                   );
                 }
