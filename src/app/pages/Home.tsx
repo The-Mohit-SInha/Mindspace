@@ -196,7 +196,7 @@ export function Home() {
             >
               {[
                 { number: '500+', label: 'Active Users' },
-                { number: '50+', label: 'Support Groups' },
+                { number: '40+', label: 'Support Groups' },
                 { number: '24/7', label: 'Availability' },
               ].map((stat, idx) => (
                 <div key={idx} className="text-center">
