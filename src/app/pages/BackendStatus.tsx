@@ -14,6 +14,8 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { motion } from 'motion/react';
+import { BackendSetupChecklist } from '../components/BackendSetupChecklist';
+import { ConnectionDebugger } from '../components/ConnectionDebugger';
 
 export function BackendStatus() {
   const [testing, setTesting] = useState(false);
@@ -177,15 +179,9 @@ export function BackendStatus() {
                     <AlertDescription className="text-blue-800">
                       Running in demo mode. All data is stored locally in your browser.
                       <br />
-                      <a
-                        href="/BACKEND_SETUP.md"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="underline font-medium mt-2 inline-flex items-center gap-1 hover:text-blue-900"
-                      >
-                        Setup Supabase backend
-                        <ExternalLink className="w-3 h-3" />
-                      </a>
+                      <span className="mt-2 inline-block">
+                        To enable persistent data storage, connect your Supabase database.
+                      </span>
                     </AlertDescription>
                   </Alert>
                 )}
@@ -247,6 +243,18 @@ export function BackendStatus() {
           </motion.div>
         </div>
 
+        {/* Setup Checklist */}
+        {!isBackendConfigured && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="mt-6"
+          >
+            <BackendSetupChecklist />
+          </motion.div>
+        )}
+
         {/* Setup Instructions Card */}
         {!isBackendConfigured && (
           <motion.div
@@ -257,42 +265,97 @@ export function BackendStatus() {
           >
             <Card className="bg-gradient-to-br from-purple-50 to-pink-50 border-2 border-purple-200">
               <CardHeader>
-                <CardTitle className="text-xl">Ready to Connect Your Backend?</CardTitle>
-                <CardDescription>Follow these simple steps to enable Supabase</CardDescription>
+                <CardTitle className="text-xl">How to Connect Your Supabase Backend</CardTitle>
+                <CardDescription>Your MindSpace platform is ready for persistent data storage</CardDescription>
               </CardHeader>
-              <CardContent>
-                <ol className="space-y-3 text-gray-700">
-                  <li className="flex gap-3">
-                    <Badge className="bg-purple-600">1</Badge>
-                    <span>Create a free account at <a href="https://supabase.com" target="_blank" rel="noopener noreferrer" className="text-purple-600 underline font-medium">supabase.com</a></span>
-                  </li>
-                  <li className="flex gap-3">
-                    <Badge className="bg-purple-600">2</Badge>
-                    <span>Create a new project and copy your API credentials</span>
-                  </li>
-                  <li className="flex gap-3">
-                    <Badge className="bg-purple-600">3</Badge>
-                    <span>Create a <code className="bg-white px-2 py-1 rounded">.env</code> file with your credentials</span>
-                  </li>
-                  <li className="flex gap-3">
-                    <Badge className="bg-purple-600">4</Badge>
-                    <span>Run the database setup SQL from our guide</span>
-                  </li>
-                  <li className="flex gap-3">
-                    <Badge className="bg-purple-600">5</Badge>
-                    <span>Restart your app - you're done! 🎉</span>
-                  </li>
-                </ol>
+              <CardContent className="space-y-6">
+                {/* Current Status */}
+                <Alert className="bg-blue-50 border-blue-300">
+                  <Database className="h-4 w-4 text-blue-600" />
+                  <AlertDescription className="text-blue-900">
+                    <strong>Current Mode: Demo Mode</strong>
+                    <br />
+                    All features work perfectly, but data resets on page refresh. Connect Supabase for permanent storage.
+                  </AlertDescription>
+                </Alert>
 
-                <Button
-                  className="w-full mt-6 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
-                  asChild
-                >
-                  <a href="/BACKEND_SETUP.md" target="_blank" rel="noopener noreferrer">
-                    <ExternalLink className="w-4 h-4 mr-2" />
-                    View Full Setup Guide
-                  </a>
-                </Button>
+                {/* Option 1: Figma Make Integration */}
+                <div className="space-y-3">
+                  <h3 className="font-semibold text-gray-900 flex items-center gap-2">
+                    <Badge className="bg-purple-600">Option 1</Badge>
+                    Using Figma Make (Recommended)
+                  </h3>
+                  <p className="text-sm text-gray-700 leading-relaxed">
+                    If you're using Figma Make, Supabase credentials are automatically injected when you connect your organization's Supabase project.
+                  </p>
+                  <div className="bg-white rounded-lg p-4 border-2 border-purple-200 space-y-2">
+                    <p className="text-sm font-medium text-gray-900">Steps:</p>
+                    <ol className="text-sm text-gray-700 space-y-1 list-decimal list-inside">
+                      <li>Click the Supabase icon in Figma Make toolbar</li>
+                      <li>Connect your organization's Supabase project</li>
+                      <li>Credentials are automatically configured</li>
+                      <li>Refresh this page to see "Backend Mode"</li>
+                    </ol>
+                  </div>
+                </div>
+
+                {/* Option 2: Manual Setup */}
+                <div className="space-y-3">
+                  <h3 className="font-semibold text-gray-900 flex items-center gap-2">
+                    <Badge className="bg-purple-600">Option 2</Badge>
+                    Manual Configuration
+                  </h3>
+                  <p className="text-sm text-gray-700 leading-relaxed">
+                    For local development or custom deployments, you can manually configure Supabase.
+                  </p>
+                  <div className="bg-white rounded-lg p-4 border-2 border-purple-200 space-y-3">
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium text-gray-900">1. Create Supabase Project</p>
+                      <p className="text-xs text-gray-600">
+                        Sign up at{' '}
+                        <a 
+                          href="https://supabase.com" 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="text-purple-600 underline font-medium"
+                        >
+                          supabase.com
+                        </a>
+                        {' '}and create a new project
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium text-gray-900">2. Run Database Schema</p>
+                      <p className="text-xs text-gray-600">
+                        Copy the SQL from <code className="bg-gray-100 px-1 rounded">/supabase/schema.sql</code> and run it in Supabase SQL Editor
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium text-gray-900">3. Add Environment Variables</p>
+                      <p className="text-xs text-gray-600 mb-2">
+                        Create a <code className="bg-gray-100 px-1 rounded">.env.local</code> file:
+                      </p>
+                      <pre className="bg-gray-900 text-green-400 p-3 rounded text-xs overflow-x-auto">
+{`VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key-here`}
+                      </pre>
+                    </div>
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium text-gray-900">4. Restart Development Server</p>
+                      <p className="text-xs text-gray-600">
+                        Restart your app and refresh this page
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Database Schema Info */}
+                <Alert className="bg-purple-50 border-purple-300">
+                  <Database className="h-4 w-4 text-purple-600" />
+                  <AlertDescription className="text-purple-900">
+                    <strong>Database Schema:</strong> Your project includes complete SQL schemas in the <code className="bg-white px-1 rounded">/supabase/</code> folder with all tables, RLS policies, and sample data ready to deploy.
+                  </AlertDescription>
+                </Alert>
               </CardContent>
             </Card>
           </motion.div>

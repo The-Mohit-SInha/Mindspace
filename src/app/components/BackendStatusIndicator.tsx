@@ -75,9 +75,7 @@ export function BackendStatusIndicator() {
                 </p>
                 {!isBackendConfigured && (
                   <a
-                    href="/BACKEND_SETUP.md"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    href="/backend-status"
                     className="text-xs text-blue-600 hover:text-blue-700 underline mt-1 inline-block font-medium"
                   >
                     Setup Supabase backend →
