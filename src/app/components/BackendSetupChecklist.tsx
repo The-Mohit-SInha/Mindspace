@@ -4,6 +4,7 @@ import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
 import { CheckCircle2, Circle, AlertCircle, ExternalLink, Copy, Check } from 'lucide-react';
 import { motion } from 'motion/react';
+import { createClient } from '@supabase/supabase-js';
 
 interface SetupStep {
   id: string;
@@ -58,20 +59,32 @@ export function BackendSetupChecklist() {
   // Auto-check database status on mount
   useEffect(() => {
     checkDatabaseStatus();
+    // Re-check every 5 seconds if not complete
+    const interval = setInterval(() => {
+      if (steps.find(s => s.id === 'database')?.status !== 'complete') {
+        checkDatabaseStatus();
+      }
+    }, 5000);
+    return () => clearInterval(interval);
   }, []);
+
+  const supabase = createClient(
+    'https://pvmnhwbtkzlnigiuxvzf.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB2bW5od2J0a3psbmlnaXV4dnpmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ2NzcyODAsImV4cCI6MjA5MDI1MzI4MH0.7VczLM52k21ljZVowYrY0G00rhE9-ws74Nf3xLHYhi4'
+  );
 
   const checkDatabaseStatus = async () => {
     try {
-      const response = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-1e942b60/test-db`);
-      const data = await response.json();
-
-      if (data.success) {
+      // Check if tables exist by querying the profiles table directly
+      const { error } = await supabase.from('profiles').select('id').limit(1);
+      
+      if (!error) {
         setSteps(prev => prev.map(s => 
           s.id === 'database' ? { ...s, status: 'complete' as const } : s
         ));
       }
-    } catch (error) {
-      console.log('Database not yet initialized');
+    } catch (err) {
+      console.log('Database tables not yet created');
     }
   };
 

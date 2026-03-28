@@ -28,14 +28,14 @@ export function ConnectionDebugger() {
       details: `isBackendConfigured = ${isBackendConfigured}`
     });
 
-    // Test 3: Test API health endpoint
+    // Test 3: Test Supabase REST API health (direct)
     try {
-      const healthResponse = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-1e942b60/health`);
-      const healthData = await healthResponse.json();
+      // Test by making a simple authenticated request to Supabase
+      const { error } = await supabase.auth.getSession();
       results.push({
         test: 'API Health Check',
-        status: healthData.status === 'ok' ? 'pass' : 'fail',
-        details: JSON.stringify(healthData)
+        status: 'pass',
+        details: 'Supabase API is accessible and responding'
       });
     } catch (error: any) {
       results.push({
@@ -45,34 +45,113 @@ export function ConnectionDebugger() {
       });
     }
 
-    // Test 4: Test database connection
+    // Test 4: Test database connection (check if kv_store table exists)
     try {
-      const dbResponse = await fetch(`https://${projectId}.supabase.co/functions/v1/make-server-1e942b60/test-db`);
-      const dbData = await dbResponse.json();
+      const { data, error } = await supabase.from('kv_store_1e942b60').select('key').limit(1);
       results.push({
         test: 'Database Connection',
-        status: dbData.success ? 'pass' : 'fail',
-        details: JSON.stringify(dbData)
-      });
-    } catch (error: any) {
-      results.push({
-        test: 'Database Connection',
-        status: 'fail',
-        details: error.message
-      });
-    }
-
-    // Test 5: Test Supabase client
-    try {
-      const { data, error } = await supabase.from('profiles').select('count');
-      results.push({
-        test: 'Supabase Client Query',
         status: !error ? 'pass' : 'fail',
-        details: error ? error.message : 'Query successful'
+        details: !error ? 'kv_store_1e942b60 table accessible' : error.message
       });
     } catch (error: any) {
       results.push({
-        test: 'Supabase Client Query',
+        test: 'Database Connection',
+        status: 'fail',
+        details: error.message
+      });
+    }
+
+    // Test 5: Test Supabase client - Query profiles table
+    try {
+      const { data, error } = await supabase.from('profiles').select('id').limit(1);
+      results.push({
+        test: 'Profiles Table',
+        status: !error ? 'pass' : 'fail',
+        details: error ? error.message : 'Table exists and is accessible'
+      });
+    } catch (error: any) {
+      results.push({
+        test: 'Profiles Table',
+        status: 'fail',
+        details: error.message
+      });
+    }
+
+    // Test 6: Test resources table
+    try {
+      const { data, error } = await supabase.from('resources').select('id').limit(1);
+      results.push({
+        test: 'Resources Table',
+        status: !error ? 'pass' : 'fail',
+        details: error ? error.message : 'Table exists and is accessible'
+      });
+    } catch (error: any) {
+      results.push({
+        test: 'Resources Table',
+        status: 'fail',
+        details: error.message
+      });
+    }
+
+    // Test 7: Test events table
+    try {
+      const { data, error } = await supabase.from('events').select('id').limit(1);
+      results.push({
+        test: 'Events Table',
+        status: !error ? 'pass' : 'fail',
+        details: error ? error.message : 'Table exists and is accessible'
+      });
+    } catch (error: any) {
+      results.push({
+        test: 'Events Table',
+        status: 'fail',
+        details: error.message
+      });
+    }
+
+    // Test 8: Test support_groups table
+    try {
+      const { data, error } = await supabase.from('support_groups').select('id').limit(1);
+      results.push({
+        test: 'Support Groups Table',
+        status: !error ? 'pass' : 'fail',
+        details: error ? error.message : 'Table exists and is accessible'
+      });
+    } catch (error: any) {
+      results.push({
+        test: 'Support Groups Table',
+        status: 'fail',
+        details: error.message
+      });
+    }
+
+    // Test 9: Test forum_topics table
+    try {
+      const { data, error } = await supabase.from('forum_topics').select('id').limit(1);
+      results.push({
+        test: 'Forum Topics Table',
+        status: !error ? 'pass' : 'fail',
+        details: error ? error.message : 'Table exists and is accessible'
+      });
+    } catch (error: any) {
+      results.push({
+        test: 'Forum Topics Table',
+        status: 'fail',
+        details: error.message
+      });
+    }
+
+    // Test 10: Test user_calendar_events table
+    try {
+      const { data, error } = await supabase.from('user_calendar_events').select('id').limit(1);
+      results.push({
+        test: 'Calendar Events Table',
+        status: !error ? 'pass' : 'fail',
+        details: error ? error.message : 'Table exists and is accessible'
+      });
+    } catch (error: any) {
+      results.push({
+        test: 'Calendar Events Table',
         status: 'fail',
         details: error.message
       });

@@ -255,6 +255,18 @@ export function BackendStatus() {
           </motion.div>
         )}
 
+        {/* Connection Debugger - Always show when backend is configured */}
+        {isBackendConfigured && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="mt-6"
+          >
+            <ConnectionDebugger />
+          </motion.div>
+        )}
+
         {/* Setup Instructions Card */}
         {!isBackendConfigured && (
           <motion.div
