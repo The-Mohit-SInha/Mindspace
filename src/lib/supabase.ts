@@ -1,23 +1,13 @@
 import { createClient } from '@supabase/supabase-js';
-import { projectId, publicAnonKey } from '/utils/supabase/info';
 
-// Supabase configuration - Use credentials from info.tsx (Figma Make integration)
-const supabaseUrl = `https://${projectId}.supabase.co`;
-const supabaseAnonKey = publicAnonKey;
-
-// Log configuration status for debugging
-console.log('🔍 Supabase Configuration Check:');
-console.log('  URL exists:', !!supabaseUrl);
-console.log('  Key exists:', !!supabaseAnonKey);
-console.log('  URL value:', supabaseUrl ? `${supabaseUrl.substring(0, 20)}...` : 'NOT SET');
+// Supabase configuration
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 
 // Check if Supabase is configured
 const isSupabaseConfigured = supabaseUrl && supabaseAnonKey && 
   supabaseUrl !== 'YOUR_SUPABASE_URL' && 
-  supabaseAnonKey !== 'YOUR_SUPABASE_ANON_KEY' &&
-  projectId !== 'YOUR_PROJECT_ID';
-
-console.log('  ✅ Backend Status:', isSupabaseConfigured ? 'CONNECTED' : 'DEMO MODE');
+  supabaseAnonKey !== 'YOUR_SUPABASE_ANON_KEY';
 
 // Create a dummy client if not configured (for development)
 const createSupabaseClient = () => {

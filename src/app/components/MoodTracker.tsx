@@ -14,7 +14,9 @@ import {
 } from 'chart.js';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
-import { Calendar } from 'lucide-react';
+import { Calendar, Sparkles } from 'lucide-react';
+import localStorageService from '../utils/localStorage';
+import { useAuth } from '../contexts/AuthContext';
 
 ChartJS.register(
   CategoryScale,
@@ -36,25 +38,62 @@ const moods = [
 ];
 
 export function MoodTracker() {
+  const { user } = useAuth();
   const [selectedMood, setSelectedMood] = useState<number | null>(null);
   const [moodHistory, setMoodHistory] = useState<number[]>([]);
   const [showChart, setShowChart] = useState(false);
+  const [note, setNote] = useState('');
 
   useEffect(() => {
-    // Load mood history from localStorage
-    const saved = localStorage.getItem('mindspace_mood_history');
-    if (saved) {
-      setMoodHistory(JSON.parse(saved));
-      setShowChart(true);
+    // Load mood history from localStorage service
+    if (user) {
+      const entries = localStorageService.getMoodEntries();
+      const userEntries = entries.filter(e => e.userId === user.id);
+      const lastSevenDays = userEntries.slice(-7);
+      const moodValues = lastSevenDays.map(e => {
+        switch(e.mood) {
+          case 'terrible': return 1;
+          case 'bad': return 2;
+          case 'okay': return 3;
+          case 'good': return 4;
+          case 'great': return 5;
+          default: return 3;
+        }
+      });
+      setMoodHistory(moodValues);
+      if (moodValues.length > 0) setShowChart(true);
     }
-  }, []);
+  }, [user]);
 
   const handleMoodSelect = (value: number) => {
+    if (!user) return;
+    
     setSelectedMood(value);
+    
+    // Map number to mood string
+    let moodStr: 'great' | 'good' | 'okay' | 'bad' | 'terrible';
+    switch(value) {
+      case 1: moodStr = 'terrible'; break;
+      case 2: moodStr = 'bad'; break;
+      case 3: moodStr = 'okay'; break;
+      case 4: moodStr = 'good'; break;
+      case 5: moodStr = 'great'; break;
+      default: moodStr = 'okay';
+    }
+    
+    // Save to localStorage service
+    localStorageService.addMoodEntry({
+      userId: user.id,
+      mood: moodStr,
+      note: note || undefined,
+      date: new Date().toISOString().split('T')[0],
+    });
+    
+    // Update history
     const newHistory = [...moodHistory, value].slice(-7); // Keep last 7 days
     setMoodHistory(newHistory);
-    localStorage.setItem('mindspace_mood_history', JSON.stringify(newHistory));
     setShowChart(true);
+    setNote('');
 
     // Show success message
     setTimeout(() => setSelectedMood(null), 2000);

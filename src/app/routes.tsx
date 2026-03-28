@@ -8,7 +8,6 @@ import { DesignFrames } from "./pages/DesignFrames";
 import { SignIn } from "./pages/SignIn";
 import { SignUp } from "./pages/SignUp";
 import { Profile } from "./pages/Profile";
-import { BackendStatus } from "./pages/BackendStatus";
 import { Layout } from "./components/Layout";
 
 export const router = createBrowserRouter([
@@ -30,7 +29,6 @@ export const router = createBrowserRouter([
       { path: "community", Component: Community },
       { path: "crisis", Component: Crisis },
       { path: "profile", Component: Profile },
-      { path: "backend-status", Component: BackendStatus },
       { path: "design-frames", Component: DesignFrames },
     ],
   },

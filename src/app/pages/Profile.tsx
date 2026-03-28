@@ -1,16 +1,6 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router';
-import { useAuth } from '../contexts/AuthContext';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
-import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Label } from '../components/ui/label';
-import { Avatar, AvatarFallback } from '../components/ui/avatar';
-import { Alert, AlertDescription } from '../components/ui/alert';
-import { Badge } from '../components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { User, Mail, Calendar, Shield, ShieldOff, LogOut, Edit2, Save, X, Eye, EyeOff, Info } from 'lucide-react';
 import { UserCalendar } from '../components/UserCalendar';
+import { BackupSettings } from '../components/BackupSettings';
 import { isBackendConfigured } from '../../lib/supabase';
 import { motion } from 'motion/react';
 
@@ -403,6 +393,15 @@ export function Profile() {
                       <strong>Your privacy is important.</strong> MindSpace is designed to support your mental health journey with full respect for your privacy. All your data is stored securely, and you have complete control over what you share.
                     </AlertDescription>
                   </Alert>
+                </motion.div>
+
+                {/* Backup Settings */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.7 }}
+                >
+                  <BackupSettings />
                 </motion.div>
               </TabsContent>
 

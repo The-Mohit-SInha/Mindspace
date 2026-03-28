@@ -1,5 +1,6 @@
 import { supabase, isBackendConfigured } from '../lib/supabase';
 import { toast } from 'sonner';
+import localStorageService from '../app/utils/localStorage';
 
 export interface CalendarEvent {
   id: string;
@@ -37,74 +38,127 @@ export interface CreateCalendarEventData {
   event_id?: string;
 }
 
-// Mock storage for demo mode
-let mockEvents: CalendarEvent[] = [
-  {
-    id: 'demo-1',
-    user_id: 'demo-user',
-    title: 'Morning Meditation',
-    description: 'Start your day with mindfulness',
-    start_date: new Date().toISOString().split('T')[0],
-    start_time: '08:00',
-    location: 'Wellness Center',
-    event_type: 'wellness_event',
-    color: 'purple',
-    reminder_enabled: true,
-    reminder_minutes: 30,
-    is_all_day: false,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: 'demo-2',
-    user_id: 'demo-user',
-    title: 'Counseling Appointment',
-    description: 'Weekly check-in session',
-    start_date: new Date(Date.now() + 86400000 * 2).toISOString().split('T')[0], // 2 days from now
-    start_time: '14:00',
-    location: 'Health Services Building',
-    event_type: 'appointment',
-    color: 'green',
-    reminder_enabled: true,
-    reminder_minutes: 60,
-    is_all_day: false,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: 'demo-3',
-    user_id: 'demo-user',
-    title: 'Study Group Meeting',
-    description: 'Psychology 101 review session',
-    start_date: new Date(Date.now() + 86400000 * 5).toISOString().split('T')[0], // 5 days from now
-    start_time: '16:30',
-    location: 'Library Room 204',
-    event_type: 'personal',
-    color: 'blue',
-    reminder_enabled: true,
-    reminder_minutes: 30,
-    is_all_day: false,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-];
+// Mock storage for demo mode - Now using centralized localStorage service
+let mockEvents: CalendarEvent[] = [];
 
-// Mock functions for demo mode
+// Initialize mock events from localStorage
+const initializeMockEvents = () => {
+  const storedEvents = localStorageService.getCalendarEvents();
+  if (storedEvents.length === 0) {
+    // Add default demo events only if none exist
+    const defaultEvents: CalendarEvent[] = [
+      {
+        id: 'demo-1',
+        user_id: 'demo-user',
+        title: 'Morning Meditation',
+        description: 'Start your day with mindfulness',
+        start_date: new Date().toISOString().split('T')[0],
+        start_time: '08:00',
+        location: 'Wellness Center',
+        event_type: 'wellness_event',
+        color: 'purple',
+        reminder_enabled: true,
+        reminder_minutes: 30,
+        is_all_day: false,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+      {
+        id: 'demo-2',
+        user_id: 'demo-user',
+        title: 'Counseling Appointment',
+        description: 'Weekly check-in session',
+        start_date: new Date(Date.now() + 86400000 * 2).toISOString().split('T')[0], // 2 days from now
+        start_time: '14:00',
+        location: 'Health Services Building',
+        event_type: 'appointment',
+        color: 'green',
+        reminder_enabled: true,
+        reminder_minutes: 60,
+        is_all_day: false,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+      {
+        id: 'demo-3',
+        user_id: 'demo-user',
+        title: 'Study Group Meeting',
+        description: 'Psychology 101 review session',
+        start_date: new Date(Date.now() + 86400000 * 5).toISOString().split('T')[0], // 5 days from now
+        start_time: '16:30',
+        location: 'Library Room 204',
+        event_type: 'personal',
+        color: 'blue',
+        reminder_enabled: true,
+        reminder_minutes: 30,
+        is_all_day: false,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+    ];
+    
+    // Store default events in localStorage
+    defaultEvents.forEach(event => {
+      localStorageService.addCalendarEvent({
+        userId: event.user_id,
+        title: event.title,
+        description: event.description,
+        date: event.start_date,
+        time: event.start_time,
+        type: event.event_type === 'wellness_event' ? 'event' : event.event_type,
+      });
+    });
+  }
+};
+
+// Initialize on module load
+initializeMockEvents();
+
+// Mock functions for demo mode - Now using localStorage service
 const mockGetUserCalendarEvents = async (userId: string): Promise<CalendarEvent[]> => {
   // Simulate network delay
   await new Promise(resolve => setTimeout(resolve, 300));
-  return mockEvents.filter(event => event.user_id === userId || event.user_id === 'demo-user');
+  
+  const storedEvents = localStorageService.getCalendarEvents();
+  const userEvents = storedEvents.filter(e => e.userId === userId);
+  
+  // Convert localStorage format to CalendarEvent format
+  return userEvents.map(e => ({
+    id: e.id,
+    user_id: e.userId,
+    title: e.title,
+    description: e.description,
+    start_date: e.date,
+    start_time: e.time || '09:00',
+    event_type: e.type === 'event' ? 'wellness_event' : (e.type as any),
+    color: 'purple',
+    reminder_enabled: false,
+    reminder_minutes: 30,
+    is_all_day: false,
+    created_at: e.createdAt,
+    updated_at: e.createdAt,
+  }));
 };
 
 const mockCreateCalendarEvent = async (userId: string, eventData: CreateCalendarEventData): Promise<CalendarEvent> => {
   await new Promise(resolve => setTimeout(resolve, 300));
   
+  // Add to localStorage service
+  localStorageService.addCalendarEvent({
+    userId,
+    title: eventData.title,
+    description: eventData.description,
+    date: eventData.start_date,
+    time: eventData.start_time,
+    type: eventData.event_type === 'wellness_event' ? 'event' : eventData.event_type,
+  });
+  
+  // Return the created event
   const newEvent: CalendarEvent = {
-    id: `demo-${Date.now()}`,
+    id: `event-${Date.now()}`,
     user_id: userId,
     ...eventData,
-    color: eventData.color || 'purple',
-    reminder_enabled: eventData.reminder_enabled ?? true,
+    reminder_enabled: eventData.reminder_enabled ?? false,
     reminder_minutes: eventData.reminder_minutes ?? 30,
     is_all_day: eventData.is_all_day ?? false,
     created_at: new Date().toISOString(),
@@ -112,7 +166,6 @@ const mockCreateCalendarEvent = async (userId: string, eventData: CreateCalendar
   };
   
   mockEvents.push(newEvent);
-  toast.success('Event added to calendar! (Demo mode - not persisted)');
   return newEvent;
 };
 

@@ -1,102 +1,54 @@
-import { useState, useEffect } from 'react';
-import { Phone, MessageCircle, AlertTriangle, ExternalLink, Clock, Loader2 } from 'lucide-react';
+import { Phone, MessageCircle, AlertTriangle, ExternalLink, Clock } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '../components/ui/alert';
 import { motion } from 'motion/react';
-import { isBackendConfigured } from '../../lib/supabase';
-import { getAllCrisisResources, type CrisisResource } from '../../services/crisisService';
 
 export function Crisis() {
-  const [crisisLines, setCrisisLines] = useState<CrisisResource[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    loadCrisisResources();
-  }, []);
-
-  const loadCrisisResources = async () => {
-    setLoading(true);
-
-    if (isBackendConfigured) {
-      try {
-        const data = await getAllCrisisResources();
-        setCrisisLines(data || getMockCrisisLines());
-      } catch (err) {
-        console.error('Failed to load crisis resources:', err);
-        setCrisisLines(getMockCrisisLines());
-      }
-    } else {
-      setCrisisLines(getMockCrisisLines());
-    }
-
-    setLoading(false);
-  };
-
-  const getMockCrisisLines = (): CrisisResource[] => {
-    return [
-      {
-        id: '1',
-        title: '988 Suicide & Crisis Lifeline',
-        type: 'Call or Text',
-        phone: '988',
-        description: 'Free and confidential support for people in distress, prevention and crisis resources.',
-        availability: '24/7',
-        is_emergency: true,
-        created_at: new Date().toISOString(),
-      },
-      {
-        id: '2',
-        title: 'Crisis Text Line',
-        type: 'Text',
-        phone: '741741',
-        description: 'Text HOME to 741741 for free, 24/7 crisis support in the US.',
-        availability: '24/7',
-        is_emergency: true,
-        created_at: new Date().toISOString(),
-      },
-      {
-        id: '3',
-        title: 'SAMHSA National Helpline',
-        type: 'Call',
-        phone: '1-800-662-4357',
-        description: 'Free, confidential, 24/7 treatment referral and information service for mental health and substance use disorders.',
-        availability: '24/7',
-        is_emergency: false,
-        created_at: new Date().toISOString(),
-      },
-      {
-        id: '4',
-        title: 'Trevor Project (LGBTQ+ Youth)',
-        type: 'Call or Text',
-        phone: '1-866-488-7386',
-        description: 'Crisis intervention and suicide prevention for LGBTQ+ young people. Text START to 678678.',
-        availability: '24/7',
-        is_emergency: true,
-        created_at: new Date().toISOString(),
-      },
-      {
-        id: '5',
-        title: 'Veterans Crisis Line',
-        type: 'Call or Text',
-        phone: '988 then Press 1',
-        description: 'Confidential help for veterans and their families. Text 838255.',
-        availability: '24/7',
-        is_emergency: true,
-        created_at: new Date().toISOString(),
-      },
-      {
-        id: '6',
-        title: 'NAMI Helpline',
-        type: 'Call or Text',
-        phone: '1-800-950-6264',
-        description: 'National Alliance on Mental Illness helpline for support, resources, and referrals. Text NAMI to 741741.',
-        availability: 'Mon-Fri, 10am-10pm ET',
-        is_emergency: false,
-        created_at: new Date().toISOString(),
-      },
-    ];
-  };
+  const crisisLines = [
+    {
+      name: 'Vandrevala Foundation',
+      phone: '1860 2662 345 / 1800 2333 330',
+      description: '24/7 crisis helpline providing support in multiple languages including Hindi, English, Tamil, Telugu, and more.',
+      availability: '24/7',
+      type: 'Call',
+    },
+    {
+      name: 'AASRA',
+      phone: '91-9820466726',
+      description: '24-hour suicide prevention helpline. Email support also available at aasrahelpline@yahoo.com',
+      availability: '24/7',
+      type: 'Call or Email',
+    },
+    {
+      name: 'iCall - TISS',
+      phone: '9152987821',
+      description: 'Psychosocial helpline by TISS. Email counseling available at icall@tiss.edu',
+      availability: 'Mon-Sat, 8am-10pm',
+      type: 'Call or Email',
+    },
+    {
+      name: 'Snehi',
+      phone: '91-22-27546669',
+      description: 'Crisis intervention center providing emotional support to those in distress.',
+      availability: 'Daily, 10am-10pm',
+      type: 'Call',
+    },
+    {
+      name: 'Mitram Foundation',
+      phone: '080-25722573',
+      description: 'Suicide prevention helpline based in Bangalore offering emotional support.',
+      availability: 'Daily, 10am-7pm',
+      type: 'Call',
+    },
+    {
+      name: 'Sumaitri',
+      phone: '011-23389090',
+      description: 'Delhi-based volunteer organization providing emotional support and suicide prevention.',
+      availability: 'Daily, 2pm-10pm',
+      type: 'Call',
+    },
+  ];
 
   const warningSignsPersonal = [
     'Talking about wanting to die or hurt yourself',
@@ -216,7 +168,7 @@ export function Crisis() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
         >
           <Alert className="mb-8 border-red-300 bg-gradient-to-br from-red-50 to-orange-50 shadow-lg backdrop-blur-sm">
             <AlertTriangle className="h-5 w-5 text-red-600" />
@@ -234,74 +186,68 @@ export function Crisis() {
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
             className="text-3xl mb-6 text-gray-900 font-bold"
           >
             24/7 Crisis Helplines
           </motion.h2>
           <div className="grid md:grid-cols-2 gap-6">
-            {loading ? (
-              <div className="col-span-2 flex justify-center items-center">
-                <Loader2 className="w-10 h-10 animate-spin" />
-              </div>
-            ) : (
-              crisisLines.map((line, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.4 + index * 0.1 }}
-                >
-                  <Card className="border-2 hover:shadow-xl transition-all duration-300 bg-white/80 backdrop-blur-sm hover:scale-[1.02] group">
-                    <CardHeader>
-                      <div className="flex items-start justify-between mb-2">
-                        <CardTitle className="text-xl font-semibold group-hover:text-purple-600 transition-colors">{line.title}</CardTitle>
-                        <motion.div
-                          whileHover={{ scale: 1.05 }}
-                          className="flex items-center gap-1 text-sm text-green-600 bg-green-50 px-3 py-1 rounded-full font-medium border border-green-200"
-                        >
-                          <Clock className="w-4 h-4" />
-                          {line.availability}
-                        </motion.div>
-                      </div>
-                      <CardDescription className="text-base">{line.description}</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="bg-gradient-to-br from-gray-50 to-gray-100 p-4 rounded-lg mb-4 border border-gray-200">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <div className="text-sm text-gray-600 mb-1 font-medium">{line.type}</div>
-                            <div className="text-2xl text-gray-900 font-bold">{line.phone}</div>
-                          </div>
-                          {line.type.includes('Call') && (
-                            <motion.div
-                              whileHover={{ scale: 1.05 }}
-                              whileTap={{ scale: 0.95 }}
-                            >
-                              <Button size="lg" className="bg-green-600 hover:bg-green-700 shadow-lg">
-                                <Phone className="w-5 h-5 mr-2" />
-                                Call Now
-                              </Button>
-                            </motion.div>
-                          )}
-                          {line.type === 'Text' && (
-                            <motion.div
-                              whileHover={{ scale: 1.05 }}
-                              whileTap={{ scale: 0.95 }}
-                            >
-                              <Button size="lg" className="bg-blue-600 hover:bg-blue-700 shadow-lg">
-                                <MessageCircle className="w-5 h-5 mr-2" />
-                                Text
-                              </Button>
-                            </motion.div>
-                          )}
+            {crisisLines.map((line, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.4 + index * 0.1 }}
+              >
+                <Card className="border-2 hover:shadow-xl transition-all duration-300 bg-white/80 backdrop-blur-sm hover:scale-[1.02] group">
+                  <CardHeader>
+                    <div className="flex items-start justify-between mb-2">
+                      <CardTitle className="text-xl font-semibold group-hover:text-purple-600 transition-colors">{line.name}</CardTitle>
+                      <motion.div
+                        whileHover={{ scale: 1.05 }}
+                        className="flex items-center gap-1 text-sm text-green-600 bg-green-50 px-3 py-1 rounded-full font-medium border border-green-200"
+                      >
+                        <Clock className="w-4 h-4" />
+                        {line.availability}
+                      </motion.div>
+                    </div>
+                    <CardDescription className="text-base">{line.description}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="bg-gradient-to-br from-gray-50 to-gray-100 p-4 rounded-lg mb-4 border border-gray-200">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="text-sm text-gray-600 mb-1 font-medium">{line.type}</div>
+                          <div className="text-2xl text-gray-900 font-bold">{line.phone}</div>
                         </div>
+                        {line.type.includes('Call') && (
+                          <motion.div
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                          >
+                            <Button size="lg" className="bg-green-600 hover:bg-green-700 shadow-lg">
+                              <Phone className="w-5 h-5 mr-2" />
+                              Call Now
+                            </Button>
+                          </motion.div>
+                        )}
+                        {line.type === 'Text' && (
+                          <motion.div
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                          >
+                            <Button size="lg" className="bg-blue-600 hover:bg-blue-700 shadow-lg">
+                              <MessageCircle className="w-5 h-5 mr-2" />
+                              Text
+                            </Button>
+                          </motion.div>
+                        )}
                       </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              ))
-            )}
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
           </div>
         </div>
 

@@ -3,30 +3,14 @@ import { toast } from 'sonner';
 
 export interface ChatMessage {
   id: string;
-  user_id: string;
+  sender_id: string;
+  sender_name: string;
   message: string;
-  is_user: boolean;
+  is_anonymous: boolean;
   created_at: string;
 }
 
-// Get all messages for a user
-export async function getAllMessages(userId: string) {
-  try {
-    const { data, error } = await supabase
-      .from('chat_messages')
-      .select('*')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: true });
-
-    if (error) throw error;
-    return data || [];
-  } catch (error: any) {
-    console.error('Get messages error:', error);
-    return [];
-  }
-}
-
-// Get recent chat messages (for general chat)
+// Get recent chat messages
 export async function getRecentMessages(limit: number = 50) {
   try {
     const { data, error } = await supabase
@@ -36,7 +20,7 @@ export async function getRecentMessages(limit: number = 50) {
       .limit(limit);
 
     if (error) throw error;
-    return data ? data.reverse() : []; // Reverse to show oldest first
+    return data.reverse(); // Reverse to show oldest first
   } catch (error: any) {
     console.error('Get messages error:', error);
     toast.error('Failed to load messages');
@@ -45,18 +29,20 @@ export async function getRecentMessages(limit: number = 50) {
 }
 
 // Send a chat message
-export async function sendMessage(
-  userId: string,
+export async function sendChatMessage(
+  senderId: string,
+  senderName: string,
   message: string,
-  isUser: boolean = true
+  isAnonymous: boolean = false
 ) {
   try {
     const { data, error } = await supabase
       .from('chat_messages')
       .insert({
-        user_id: userId,
+        sender_id: senderId,
+        sender_name: isAnonymous ? 'Anonymous' : senderName,
         message,
-        is_user: isUser,
+        is_anonymous: isAnonymous,
       })
       .select()
       .single();
@@ -66,18 +52,8 @@ export async function sendMessage(
   } catch (error: any) {
     console.error('Send message error:', error);
     toast.error('Failed to send message');
-    return null;
+    throw error;
   }
-}
-
-// Legacy function for compatibility
-export async function sendChatMessage(
-  senderId: string,
-  senderName: string,
-  message: string,
-  isAnonymous: boolean = false
-) {
-  return sendMessage(senderId, message, true);
 }
 
 // Subscribe to new messages (real-time)

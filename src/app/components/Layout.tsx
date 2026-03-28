@@ -7,6 +7,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { Avatar, AvatarFallback } from './ui/avatar';
 import { FloatingChatButton } from './FloatingChatButton';
 import { AnimatedBackground } from './AnimatedBackground';
+import { LocalBackupIndicator } from './LocalBackupIndicator';
 
 export function Layout() {
   const location = useLocation();
@@ -70,6 +71,11 @@ export function Layout() {
                   {item.label}
                 </Link>
               ))}
+              
+              {/* Local Backup Indicator */}
+              <div className="ml-2">
+                <LocalBackupIndicator />
+              </div>
               
               {/* Auth Section */}
               {isAuthenticated && user ? (
@@ -181,15 +187,6 @@ export function Layout() {
               </Link>{' '}
               page for immediate help.
             </p>
-            <div className="mt-3 flex items-center justify-center gap-4 text-xs text-gray-400">
-              <Link to="/backend-status" className="hover:text-purple-600 transition-colors">
-                Backend Status
-              </Link>
-              <span>•</span>
-              <a href="/BACKEND_SETUP.md" target="_blank" rel="noopener noreferrer" className="hover:text-purple-600 transition-colors">
-                Setup Guide
-              </a>
-            </div>
           </div>
         </div>
       </footer>
