@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { ClipboardList, AlertCircle, CheckCircle2, Brain, Heart, Activity, ArrowRight, BookOpen, Users, Phone } from 'lucide-react';
+import { motion } from 'motion/react';
+import { ClipboardList, AlertCircle, CheckCircle2, Brain, Heart, Activity, ArrowRight, BookOpen, Users, Phone, Sparkles, Shield } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { RadioGroup, RadioGroupItem } from '../components/ui/radio-group';
@@ -22,6 +23,27 @@ export function Assessment() {
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [showResults, setShowResults] = useState(false);
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.5,
+      },
+    },
+  };
 
   const assessmentTypes = [
     {
@@ -376,73 +398,139 @@ export function Assessment() {
     return (
       <div className="w-full">
         {/* Hero Section */}
-        <section className="bg-gradient-to-br from-purple-600 to-pink-600 text-white">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-            <div className="max-w-3xl">
-              <h1 className="text-4xl md:text-5xl mb-4">Self-Assessment Tools</h1>
-              <p className="text-xl text-purple-100">
+        <section className="relative overflow-hidden bg-gradient-to-br from-purple-600 via-pink-600 to-purple-700 text-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+              className="max-w-3xl"
+            >
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+                className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-6 py-3 rounded-full mb-6 shadow-lg"
+              >
+                <Shield className="w-5 h-5" />
+                <span className="font-medium">Confidential & Validated</span>
+              </motion.div>
+              
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3, duration: 0.8 }}
+                className="text-4xl md:text-5xl lg:text-6xl mb-6"
+              >
+                Self-Assessment Tools
+              </motion.h1>
+              
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5, duration: 0.8 }}
+                className="text-xl text-purple-100 leading-relaxed"
+              >
                 Take a confidential assessment to better understand your mental health. These tools are for informational purposes and not a substitute for professional diagnosis.
-              </p>
-            </div>
+              </motion.p>
+            </motion.div>
           </div>
+
+          {/* Decorative background elements */}
+          <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -z-0"></div>
+          <div className="absolute bottom-0 left-0 w-80 h-80 bg-pink-500/20 rounded-full blur-3xl -z-0"></div>
         </section>
 
         {/* Assessment Selection */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <Alert className="mb-8 border-blue-200 bg-blue-50">
-            <AlertCircle className="h-4 w-4 text-blue-600" />
-            <AlertDescription className="text-blue-900">
-              These assessments are based on validated screening tools but are not diagnostic. 
-              If you're concerned about your mental health, please consult with a healthcare professional.
-            </AlertDescription>
-          </Alert>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.6 }}
+          >
+            <Alert className="mb-8 border-blue-200 bg-blue-50/80 backdrop-blur-sm shadow-sm">
+              <AlertCircle className="h-4 w-4 text-blue-600" />
+              <AlertDescription className="text-blue-900">
+                These assessments are based on validated screening tools but are not diagnostic. 
+                If you're concerned about your mental health, please consult with a healthcare professional.
+              </AlertDescription>
+            </Alert>
+          </motion.div>
 
-          <h2 className="text-2xl mb-6 text-gray-900">Choose an Assessment</h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            {assessmentTypes.map((assessment) => (
-              <Card
-                key={assessment.id}
-                className="hover:shadow-lg transition-shadow cursor-pointer border-2 hover:border-purple-300"
-                onClick={() => setSelectedAssessment(assessment.id)}
-              >
-                <CardHeader>
-                  <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${assessment.color} flex items-center justify-center mb-4`}>
-                    <assessment.icon className="w-6 h-6 text-white" />
-                  </div>
-                  <CardTitle>{assessment.title}</CardTitle>
-                  <CardDescription>{assessment.description}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Button className="w-full">Start Assessment</Button>
-                </CardContent>
-              </Card>
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.6 }}
+            className="text-3xl mb-8 text-gray-900 text-center"
+          >
+            Choose an Assessment
+          </motion.h2>
+          
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="grid md:grid-cols-3 gap-6"
+          >
+            {assessmentTypes.map((assessment, idx) => (
+              <motion.div key={assessment.id} variants={itemVariants}>
+                <motion.div
+                  whileHover={{ y: -8, scale: 1.02 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                >
+                  <Card
+                    className="h-full border-2 border-transparent hover:border-purple-200 transition-all bg-white/80 backdrop-blur-sm hover:shadow-2xl cursor-pointer"
+                    onClick={() => setSelectedAssessment(assessment.id)}
+                  >
+                    <CardHeader>
+                      <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${assessment.color} flex items-center justify-center mb-4 shadow-lg`}>
+                        <assessment.icon className="w-7 h-7 text-white" />
+                      </div>
+                      <CardTitle className="text-xl">{assessment.title}</CardTitle>
+                      <CardDescription className="text-base">{assessment.description}</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <Button className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-md">
+                        Start Assessment
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
 
           {/* Information Cards */}
-          <div className="grid md:grid-cols-2 gap-6 mt-12">
-            <Card className="bg-purple-50 border-purple-200">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6, duration: 0.6 }}
+            className="grid md:grid-cols-2 gap-6 mt-12"
+          >
+            <Card className="bg-gradient-to-br from-purple-50 to-pink-50 border-2 border-purple-200 shadow-md">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <ClipboardList className="w-5 h-5 text-purple-600" />
-                  How It Works
-                </CardTitle>
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-md">
+                    <ClipboardList className="w-5 h-5 text-white" />
+                  </div>
+                  <CardTitle className="text-xl">How It Works</CardTitle>
+                </div>
               </CardHeader>
               <CardContent>
-                <ul className="space-y-2 text-gray-700">
-                  <li className="flex gap-2">
+                <ul className="space-y-3 text-gray-700">
+                  <li className="flex gap-3">
                     <CheckCircle2 className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
                     <span>Answer questions honestly about your recent experiences</span>
                   </li>
-                  <li className="flex gap-2">
+                  <li className="flex gap-3">
                     <CheckCircle2 className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
                     <span>Receive personalized results and recommendations</span>
                   </li>
-                  <li className="flex gap-2">
+                  <li className="flex gap-3">
                     <CheckCircle2 className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
                     <span>All responses are completely confidential</span>
                   </li>
-                  <li className="flex gap-2">
+                  <li className="flex gap-3">
                     <CheckCircle2 className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
                     <span>Takes approximately 5-10 minutes to complete</span>
                   </li>
@@ -450,35 +538,37 @@ export function Assessment() {
               </CardContent>
             </Card>
 
-            <Card className="bg-blue-50 border-blue-200">
+            <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 border-2 border-blue-200 shadow-md">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <AlertCircle className="w-5 h-5 text-blue-600" />
-                  Important Notes
-                </CardTitle>
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-md">
+                    <AlertCircle className="w-5 h-5 text-white" />
+                  </div>
+                  <CardTitle className="text-xl">Important Notes</CardTitle>
+                </div>
               </CardHeader>
               <CardContent>
-                <ul className="space-y-2 text-gray-700">
-                  <li className="flex gap-2">
-                    <span className="text-blue-600 flex-shrink-0">•</span>
+                <ul className="space-y-3 text-gray-700">
+                  <li className="flex gap-3">
+                    <span className="text-blue-600 flex-shrink-0 font-semibold">•</span>
                     <span>These tools are for screening purposes only</span>
                   </li>
-                  <li className="flex gap-2">
-                    <span className="text-blue-600 flex-shrink-0">•</span>
+                  <li className="flex gap-3">
+                    <span className="text-blue-600 flex-shrink-0 font-semibold">•</span>
                     <span>Results do not constitute a clinical diagnosis</span>
                   </li>
-                  <li className="flex gap-2">
-                    <span className="text-blue-600 flex-shrink-0">•</span>
+                  <li className="flex gap-3">
+                    <span className="text-blue-600 flex-shrink-0 font-semibold">•</span>
                     <span>Consider discussing results with a healthcare provider</span>
                   </li>
-                  <li className="flex gap-2">
-                    <span className="text-blue-600 flex-shrink-0">•</span>
+                  <li className="flex gap-3">
+                    <span className="text-blue-600 flex-shrink-0 font-semibold">•</span>
                     <span>If you're in crisis, please seek immediate help</span>
                   </li>
                 </ul>
               </CardContent>
             </Card>
-          </div>
+          </motion.div>
         </section>
       </div>
     );

@@ -4,6 +4,7 @@ import { router } from './routes';
 import { Toaster } from './components/ui/sonner';
 import { AuthProvider } from './contexts/AuthContext';
 import { SplashScreen } from './components/SplashScreen';
+import { BackendStatusIndicator } from './components/BackendStatusIndicator';
 
 export default function App() {
   const [showSplash, setShowSplash] = useState(true);
@@ -16,6 +17,7 @@ export default function App() {
     <AuthProvider>
       <RouterProvider router={router} />
       <Toaster />
+      <BackendStatusIndicator />
     </AuthProvider>
   );
 }

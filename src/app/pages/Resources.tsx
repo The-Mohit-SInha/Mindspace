@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Book, Brain, Heart, Activity, Smile, Moon, ArrowLeft, Clock, AlertCircle, CheckCircle2, Lightbulb, AlertTriangle } from 'lucide-react';
+import { motion } from 'motion/react';
+import { Book, Brain, Heart, Activity, Smile, Moon, ArrowLeft, Clock, AlertCircle, CheckCircle2, Lightbulb, AlertTriangle, Sparkles } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../components/ui/accordion';
@@ -11,6 +12,27 @@ import { Separator } from '../components/ui/separator';
 export function Resources() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedArticle, setSelectedArticle] = useState<number | null>(null);
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.5,
+      },
+    },
+  };
 
   const categories = [
     { id: 'all', label: 'All Resources', icon: Book },
@@ -649,21 +671,53 @@ export function Resources() {
   return (
     <div className="w-full">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-blue-600 to-purple-600 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="max-w-3xl">
-            <h1 className="text-4xl md:text-5xl mb-4">Mental Health Resources</h1>
-            <p className="text-xl text-blue-100">
+      <section className="relative overflow-hidden bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="max-w-3xl"
+          >
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+              className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-6 py-3 rounded-full mb-6 shadow-lg"
+            >
+              <Sparkles className="w-5 h-5" />
+              <span className="font-medium">Evidence-Based Resources</span>
+            </motion.div>
+            
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.8 }}
+              className="text-4xl md:text-5xl lg:text-6xl mb-6"
+            >
+              Mental Health Resources
+            </motion.h1>
+            
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5, duration: 0.8 }}
+              className="text-xl text-blue-100 leading-relaxed"
+            >
               Explore evidence-based articles, coping strategies, and information to support your mental health journey.
-            </p>
-          </div>
+            </motion.p>
+          </motion.div>
         </div>
+
+        {/* Decorative background elements */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -z-0"></div>
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-pink-500/20 rounded-full blur-3xl -z-0"></div>
       </section>
 
       {/* Main Content */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <Tabs defaultValue="articles" className="w-full">
-          <TabsList className="grid w-full max-w-md grid-cols-3 mb-8">
+          <TabsList className="grid w-full max-w-md mx-auto grid-cols-3 mb-8 bg-white/80 backdrop-blur-sm shadow-lg">
             <TabsTrigger value="articles">Articles</TabsTrigger>
             <TabsTrigger value="coping">Coping Skills</TabsTrigger>
             <TabsTrigger value="faq">FAQ</TabsTrigger>
@@ -672,177 +726,289 @@ export function Resources() {
           {/* Articles Tab */}
           <TabsContent value="articles" className="space-y-8">
             {/* Category Filter */}
-            <div className="flex flex-wrap gap-2">
-              {categories.map((category) => (
-                <button
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="flex flex-wrap gap-2 justify-center"
+            >
+              {categories.map((category, idx) => (
+                <motion.button
                   key={category.id}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: idx * 0.05 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                   onClick={() => setSelectedCategory(category.id)}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-full transition-colors ${
+                  className={`flex items-center gap-2 px-5 py-2.5 rounded-full transition-all shadow-sm ${
                     selectedCategory === category.id
-                      ? 'bg-purple-600 text-white'
-                      : 'bg-white border border-gray-200 text-gray-600 hover:border-purple-300'
+                      ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg'
+                      : 'bg-white/80 backdrop-blur-sm border border-gray-200 text-gray-700 hover:border-purple-300 hover:shadow-md'
                   }`}
                 >
                   <category.icon className="w-4 h-4" />
-                  <span>{category.label}</span>
-                </button>
+                  <span className="font-medium">{category.label}</span>
+                </motion.button>
               ))}
-            </div>
+            </motion.div>
 
             {/* Articles Grid */}
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <motion.div
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+              className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
+            >
               {filteredArticles.map((article, index) => {
                 const articleIndex = articles.findIndex(a => a.title === article.title);
                 return (
-                  <Card 
-                    key={index} 
-                    className="hover:shadow-lg transition-shadow cursor-pointer"
-                    onClick={() => setSelectedArticle(articleIndex)}
-                  >
-                    <CardHeader>
-                      <div className="flex items-center gap-2 mb-2">
-                        {article.tags.map((tag) => (
-                          <Badge key={tag} variant="secondary">{tag}</Badge>
-                        ))}
-                      </div>
-                      <CardTitle className="text-xl">{article.title}</CardTitle>
-                      <CardDescription>{article.description}</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-gray-500">{article.readTime}</p>
-                    </CardContent>
-                  </Card>
+                  <motion.div key={index} variants={itemVariants}>
+                    <motion.div
+                      whileHover={{ y: -8, scale: 1.02 }}
+                      transition={{ type: "spring", stiffness: 300 }}
+                    >
+                      <Card 
+                        className="h-full border-2 border-transparent hover:border-purple-200 transition-all bg-white/80 backdrop-blur-sm hover:shadow-2xl cursor-pointer"
+                        onClick={() => setSelectedArticle(articleIndex)}
+                      >
+                        <CardHeader>
+                          <div className="flex flex-wrap items-center gap-2 mb-3">
+                            {article.tags.map((tag) => (
+                              <Badge key={tag} variant="secondary" className="bg-purple-100 text-purple-700 border-purple-200">
+                                {tag}
+                              </Badge>
+                            ))}
+                          </div>
+                          <CardTitle className="text-xl leading-tight">{article.title}</CardTitle>
+                          <CardDescription className="text-base mt-2">{article.description}</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="flex items-center gap-2 text-sm text-gray-500">
+                            <Clock className="w-4 h-4" />
+                            <span>{article.readTime}</span>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  </motion.div>
                 );
               })}
-            </div>
+            </motion.div>
           </TabsContent>
 
           {/* Coping Skills Tab */}
           <TabsContent value="coping" className="space-y-8">
-            <div className="grid md:grid-cols-2 gap-8">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="grid lg:grid-cols-2 gap-8"
+            >
               {/* Coping Strategies */}
-              <div>
-                <h2 className="text-2xl mb-6 text-gray-900">Quick Coping Strategies</h2>
-                <div className="space-y-4">
-                  {copingStrategies.map((category) => (
-                    <div key={category.category}>
-                      <h3 className="text-xl font-bold mb-3">{category.category}</h3>
-                      <div className="space-y-4">
+              <div className="space-y-6">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center shadow-lg">
+                    <Activity className="w-6 h-6 text-white" />
+                  </div>
+                  <h2 className="text-3xl text-gray-900">Quick Coping Strategies</h2>
+                </div>
+                
+                <motion.div
+                  variants={containerVariants}
+                  initial="hidden"
+                  animate="visible"
+                  className="space-y-6"
+                >
+                  {copingStrategies.map((category, catIdx) => (
+                    <motion.div key={category.category} variants={itemVariants}>
+                      <h3 className="text-xl font-semibold mb-4 text-gray-900 flex items-center gap-2">
+                        <span className="w-8 h-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"></span>
+                        {category.category}
+                      </h3>
+                      <div className="space-y-3">
                         {category.strategies.map((strategy, index) => (
-                          <Card key={index}>
-                            <CardHeader>
-                              <div className="flex items-start gap-4">
-                                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0">
-                                  <strategy.icon className="w-5 h-5 text-white" />
+                          <motion.div
+                            key={index}
+                            whileHover={{ scale: 1.02, x: 4 }}
+                            transition={{ type: "spring", stiffness: 400 }}
+                          >
+                            <Card className="border-2 border-transparent hover:border-purple-200 hover:shadow-lg transition-all bg-white/80 backdrop-blur-sm">
+                              <CardHeader className="pb-4">
+                                <div className="flex items-start gap-4">
+                                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0 shadow-md">
+                                    <strategy.icon className="w-6 h-6 text-white" />
+                                  </div>
+                                  <div className="flex-1">
+                                    <CardTitle className="text-lg mb-2">{strategy.title}</CardTitle>
+                                    <CardDescription className="text-base leading-relaxed">{strategy.description}</CardDescription>
+                                    <Badge variant="outline" className="mt-3 text-xs">
+                                      {strategy.difficulty}
+                                    </Badge>
+                                  </div>
                                 </div>
-                                <div>
-                                  <CardTitle className="text-lg">{strategy.title}</CardTitle>
-                                  <CardDescription className="mt-2">{strategy.description}</CardDescription>
-                                </div>
-                              </div>
-                            </CardHeader>
-                          </Card>
+                              </CardHeader>
+                            </Card>
+                          </motion.div>
                         ))}
                       </div>
-                    </div>
+                    </motion.div>
                   ))}
-                </div>
+                </motion.div>
               </div>
 
               {/* Guided Exercise */}
-              <div>
-                <h2 className="text-2xl mb-6 text-gray-900">Guided Meditation</h2>
-                <Card className="bg-gradient-to-br from-blue-50 to-purple-50">
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3, duration: 0.6 }}
+                className="lg:sticky lg:top-24 h-fit"
+              >
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center shadow-lg">
+                    <Brain className="w-6 h-6 text-white" />
+                  </div>
+                  <h2 className="text-3xl text-gray-900">Guided Meditation</h2>
+                </div>
+                
+                <Card className="bg-gradient-to-br from-blue-5 via-purple-50 to-pink-50 border-2 border-purple-200 shadow-xl">
                   <CardContent className="p-6">
-                    <div className="relative rounded-xl overflow-hidden mb-6">
+                    <div className="relative rounded-2xl overflow-hidden mb-6 shadow-lg">
                       <ImageWithFallback
                         src="https://images.unsplash.com/photo-1764192114257-ae9ecf97eb6f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtZWRpdGF0aW9uJTIwbWluZGZ1bG5lc3MlMjBjYWxtfGVufDF8fHx8MTc3NDYwMzU5OHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
                         alt="Meditation practice"
-                        className="w-full h-48 object-cover"
+                        className="w-full h-56 object-cover"
                       />
+                      <div className="absolute inset-0 bg-gradient-to-t from-purple-900/30 to-transparent"></div>
                     </div>
-                    <h3 className="text-xl mb-3 text-gray-900">5-Minute Mindfulness</h3>
-                    <p className="text-gray-600 mb-4">
+                    <h3 className="text-2xl mb-3 text-gray-900 font-semibold">5-Minute Mindfulness</h3>
+                    <p className="text-gray-700 mb-6 leading-relaxed">
                       Take a moment to center yourself with this simple mindfulness exercise.
                     </p>
-                    <ol className="space-y-3 text-gray-700">
-                      <li className="flex gap-3">
-                        <span className="flex-shrink-0 w-6 h-6 rounded-full bg-purple-600 text-white text-sm flex items-center justify-center">1</span>
-                        <span>Find a comfortable seated position and close your eyes.</span>
-                      </li>
-                      <li className="flex gap-3">
-                        <span className="flex-shrink-0 w-6 h-6 rounded-full bg-purple-600 text-white text-sm flex items-center justify-center">2</span>
-                        <span>Take three deep breaths, noticing the sensation of breathing.</span>
-                      </li>
-                      <li className="flex gap-3">
-                        <span className="flex-shrink-0 w-6 h-6 rounded-full bg-purple-600 text-white text-sm flex items-center justify-center">3</span>
-                        <span>Scan your body from head to toe, releasing any tension.</span>
-                      </li>
-                      <li className="flex gap-3">
-                        <span className="flex-shrink-0 w-6 h-6 rounded-full bg-purple-600 text-white text-sm flex items-center justify-center">4</span>
-                        <span>Return focus to your breath whenever your mind wanders.</span>
-                      </li>
-                      <li className="flex gap-3">
-                        <span className="flex-shrink-0 w-6 h-6 rounded-full bg-purple-600 text-white text-sm flex items-center justify-center">5</span>
-                        <span>Slowly open your eyes when ready and notice how you feel.</span>
-                      </li>
+                    <ol className="space-y-4 text-gray-700">
+                      {[
+                        'Find a comfortable seated position and close your eyes.',
+                        'Take three deep breaths, noticing the sensation of breathing.',
+                        'Scan your body from head to toe, releasing any tension.',
+                        'Return focus to your breath whenever your mind wanders.',
+                        'Slowly open your eyes when ready and notice how you feel.'
+                      ].map((step, idx) => (
+                        <motion.li
+                          key={idx}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.5 + idx * 0.1 }}
+                          className="flex gap-4"
+                        >
+                          <span className="flex-shrink-0 w-8 h-8 rounded-full bg-gradient-to-br from-purple-600 to-pink-600 text-white text-sm flex items-center justify-center font-semibold shadow-md">
+                            {idx + 1}
+                          </span>
+                          <span className="leading-relaxed pt-1">{step}</span>
+                        </motion.li>
+                      ))}
                     </ol>
                   </CardContent>
                 </Card>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           </TabsContent>
 
           {/* FAQ Tab */}
           <TabsContent value="faq" className="space-y-8">
-            <div className="max-w-4xl mx-auto">
-              <div className="mb-8">
-                <h2 className="text-2xl mb-2 text-gray-900">Frequently Asked Questions</h2>
-                <p className="text-gray-600">Find answers to common questions about mental health and support services</p>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="max-w-4xl mx-auto"
+            >
+              <div className="text-center mb-12">
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+                  className="inline-flex items-center gap-2 bg-gradient-to-r from-purple-100 to-pink-100 px-6 py-3 rounded-full mb-6 shadow-lg"
+                >
+                  <Lightbulb className="w-5 h-5 text-purple-600" />
+                  <span className="font-medium text-purple-700">Need Answers?</span>
+                </motion.div>
+                
+                <h2 className="text-4xl mb-4 text-gray-900">Frequently Asked Questions</h2>
+                <p className="text-xl text-gray-600">Find answers to common questions about mental health and support services</p>
               </div>
 
-              <div className="space-y-8">
+              <motion.div
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+                className="space-y-8"
+              >
                 {faqs.map((faqCategory, categoryIndex) => (
-                  <div key={categoryIndex}>
-                    <h3 className="text-xl mb-4 text-gray-900 flex items-center gap-2">
-                      <span className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 text-white text-sm flex items-center justify-center">
+                  <motion.div key={categoryIndex} variants={itemVariants}>
+                    <div className="flex items-center gap-3 mb-5">
+                      <span className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 text-white text-lg font-semibold flex items-center justify-center shadow-lg">
                         {categoryIndex + 1}
                       </span>
-                      {faqCategory.category}
-                    </h3>
-                    <Accordion type="single" collapsible className="w-full">
-                      {faqCategory.questions.map((faq, questionIndex) => (
-                        <AccordionItem 
-                          key={questionIndex} 
-                          value={`category-${categoryIndex}-question-${questionIndex}`}
-                        >
-                          <AccordionTrigger className="text-left hover:text-purple-600">
-                            {faq.question}
-                          </AccordionTrigger>
-                          <AccordionContent className="text-gray-600 leading-relaxed">
-                            {faq.answer}
-                          </AccordionContent>
-                        </AccordionItem>
-                      ))}
-                    </Accordion>
-                  </div>
+                      <h3 className="text-2xl text-gray-900 font-semibold">{faqCategory.category}</h3>
+                    </div>
+                    
+                    <Card className="bg-white/80 backdrop-blur-sm border-2 border-gray-200 hover:border-purple-200 transition-colors shadow-md">
+                      <CardContent className="p-6">
+                        <Accordion type="single" collapsible className="w-full">
+                          {faqCategory.questions.map((faq, questionIndex) => (
+                            <AccordionItem 
+                              key={questionIndex} 
+                              value={`category-${categoryIndex}-question-${questionIndex}`}
+                              className="border-b border-gray-200 last:border-0"
+                            >
+                              <AccordionTrigger className="text-left hover:text-purple-600 font-medium text-lg py-4">
+                                {faq.question}
+                              </AccordionTrigger>
+                              <AccordionContent className="text-gray-600 leading-relaxed text-base pb-4">
+                                {faq.answer}
+                              </AccordionContent>
+                            </AccordionItem>
+                          ))}
+                        </Accordion>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
                 ))}
-              </div>
+              </motion.div>
 
               {/* Additional Help Card */}
-              <Card className="mt-8 bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200">
-                <CardContent className="p-6">
-                  <h3 className="text-lg mb-2 text-gray-900">Still Have Questions?</h3>
-                  <p className="text-gray-700 mb-4">
-                    If you can't find the answer you're looking for, don't hesitate to reach out to campus counseling services or visit our Crisis Support page for immediate assistance.
-                  </p>
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    <Button variant="outline">Contact Counseling Services</Button>
-                    <Button variant="outline">Visit Crisis Support</Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.8, duration: 0.6 }}
+              >
+                <Card className="mt-12 bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 border-2 border-purple-200 shadow-xl">
+                  <CardContent className="p-8 text-center">
+                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mx-auto mb-4 shadow-lg">
+                      <Heart className="w-8 h-8 text-white" />
+                    </div>
+                    <h3 className="text-2xl mb-3 text-gray-900 font-semibold">Still Have Questions?</h3>
+                    <p className="text-gray-700 mb-6 leading-relaxed max-w-2xl mx-auto">
+                      If you can't find the answer you're looking for, don't hesitate to reach out to campus counseling services or visit our Crisis Support page for immediate assistance.
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                      <Button 
+                        variant="outline" 
+                        size="lg"
+                        className="border-2 border-purple-300 hover:bg-purple-50 hover:border-purple-400"
+                      >
+                        Contact Counseling Services
+                      </Button>
+                      <Button 
+                        size="lg"
+                        className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg"
+                      >
+                        Visit Crisis Support
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            </motion.div>
           </TabsContent>
         </Tabs>
       </section>

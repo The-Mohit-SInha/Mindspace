@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
-import { Users, MessageCircle, Heart, Calendar, UserPlus, Search, ArrowLeft, Send, MapPin, Clock, ThumbsUp, CheckCircle, BookmarkCheck, FileText, CalendarCheck, ClipboardCheck } from 'lucide-react';
+import { motion } from 'motion/react';
+import { Users, MessageCircle, Heart, Calendar, UserPlus, Search, ArrowLeft, Send, MapPin, Clock, ThumbsUp, CheckCircle, BookmarkCheck, FileText, CalendarCheck, ClipboardCheck, Sparkles } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -48,6 +49,28 @@ export function Community() {
   const [myRegisteredEvents, setMyRegisteredEvents] = useState<Array<{ id: number; title: string; date: string; time: string; location: string; type: string }>>([]);
   const [myEventProposals, setMyEventProposals] = useState<Array<{ id: number; title: string; orgName: string; date: string; status: string; submittedDate: string }>>([]);
   const [eventInCalendar, setEventInCalendar] = useState<Record<number, boolean>>({});
+
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.5,
+      },
+    },
+  };
 
   // Auto-fill forms with user data when user is authenticated
   useEffect(() => {
@@ -661,52 +684,95 @@ export function Community() {
   return (
     <div className="w-full">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-green-600 to-emerald-600 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-          <div className="max-w-3xl">
-            <h1 className="text-4xl md:text-5xl mb-4">Support Community</h1>
-            <p className="text-xl text-green-100">
+      <section className="relative overflow-hidden bg-gradient-to-br from-green-600 via-emerald-600 to-teal-600 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="max-w-3xl"
+          >
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+              className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-6 py-3 rounded-full mb-6 shadow-lg"
+            >
+              <Heart className="w-5 h-5" />
+              <span className="font-medium">Connect & Support</span>
+            </motion.div>
+            
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.8 }}
+              className="text-4xl md:text-5xl lg:text-6xl mb-6"
+            >
+              Support Community
+            </motion.h1>
+            
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5, duration: 0.8 }}
+              className="text-xl text-green-100 leading-relaxed"
+            >
               Connect with peers, join support groups, and find community. You're not alone in this journey.
-            </p>
-          </div>
+            </motion.p>
+          </motion.div>
         </div>
+
+        {/* Decorative background elements */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -z-0"></div>
+        <div className="absolute bottom-0 left-0 w-80 h-80 bg-teal-500/20 rounded-full blur-3xl -z-0"></div>
       </section>
 
       {/* Featured Image */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8">
-        <div className="relative rounded-2xl overflow-hidden shadow-2xl">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6, duration: 0.8 }}
+          className="relative rounded-2xl overflow-hidden shadow-2xl backdrop-blur-sm"
+        >
           <ImageWithFallback
             src="https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkaXZlcnNlJTIwc3R1ZGVudHMlMjBzdXBwb3J0JTIwZ3JvdXB8ZW58MXx8fHwxNzc0NjM1NjI1fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
             alt="Students supporting each other"
             className="w-full h-64 md:h-80 object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end">
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end">
             <div className="p-8">
-              <p className="text-white text-lg md:text-xl">
+              <p className="text-white text-lg md:text-xl font-medium">
                 Building connections and supporting each other through shared experiences
               </p>
             </div>
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* Auth Alert */}
       {!isAuthenticated && (
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
-          <Alert className="border-purple-200 bg-purple-50">
-            <Heart className="w-4 h-4 text-purple-600" />
-            <AlertDescription className="text-purple-800">
-              <strong>Sign in to participate!</strong> Create an account to join support groups, post in forums, and connect with peer counselors.{' '}
-              <button onClick={() => navigate('/sign-in')} className="underline font-medium">Sign in now</button>
-            </AlertDescription>
-          </Alert>
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8, duration: 0.5 }}
+          >
+            <Alert className="border-purple-200 bg-purple-50/80 backdrop-blur-sm shadow-lg">
+              <Heart className="w-4 h-4 text-purple-600" />
+              <AlertDescription className="text-purple-800">
+                <strong>Sign in to participate!</strong> Create an account to join support groups, post in forums, and connect with peer counselors.{' '}
+                <button onClick={() => navigate('/sign-in')} className="underline font-medium hover:text-purple-900 transition-colors">Sign in now</button>
+              </AlertDescription>
+            </Alert>
+          </motion.div>
         </section>
       )}
 
       {/* Main Content */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <Tabs defaultValue="groups" className="w-full">
-          <TabsList className="grid w-full max-w-3xl grid-cols-5 mb-8">
+          <TabsList className="grid w-full max-w-3xl grid-cols-5 mb-8 bg-white/80 backdrop-blur-sm shadow-lg">
             <TabsTrigger value="groups">Support Groups</TabsTrigger>
             <TabsTrigger value="forum">Forum</TabsTrigger>
             <TabsTrigger value="peers">Peer Support</TabsTrigger>
@@ -850,13 +916,18 @@ export function Community() {
                   </div>
                 </div>
 
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {supportGroups.map((group) => (
-                    <Card 
-                      key={group.id} 
-                      className="hover:shadow-lg transition-shadow cursor-pointer"
-                      onClick={() => setSelectedGroup(group.id)}
-                    >
+                <motion.div
+                  variants={containerVariants}
+                  initial="hidden"
+                  animate="visible"
+                  className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
+                >
+                  {supportGroups.map((group, index) => (
+                    <motion.div key={group.id} variants={itemVariants}>
+                      <Card 
+                        className="hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer backdrop-blur-sm bg-white/95 border-2"
+                        onClick={() => setSelectedGroup(group.id)}
+                      >
                       <CardHeader>
                         <div className="flex items-start justify-between mb-2">
                           <Badge className={group.color}>{group.category}</Badge>
@@ -885,8 +956,9 @@ export function Community() {
                         </Button>
                       </CardContent>
                     </Card>
+                    </motion.div>
                   ))}
-                </div>
+                </motion.div>
               </>
             )}
           </TabsContent>
@@ -1036,13 +1108,18 @@ export function Community() {
                   </Button>
                 </div>
 
-                <div className="space-y-4">
-                  {forumTopics.map((topic) => (
-                    <Card 
-                      key={topic.id} 
-                      className="hover:shadow-md transition-shadow cursor-pointer"
-                      onClick={() => setSelectedTopic(topic.id)}
-                    >
+                <motion.div
+                  variants={containerVariants}
+                  initial="hidden"
+                  animate="visible"
+                  className="space-y-4"
+                >
+                  {forumTopics.map((topic, index) => (
+                    <motion.div key={topic.id} variants={itemVariants}>
+                      <Card 
+                        className="hover:shadow-xl hover:scale-[1.02] transition-all duration-300 cursor-pointer backdrop-blur-sm bg-white/95 border"
+                        onClick={() => setSelectedTopic(topic.id)}
+                      >
                       <CardContent className="p-6">
                         <div className="flex items-start gap-4">
                           <Avatar className="w-10 h-10">
@@ -1076,8 +1153,9 @@ export function Community() {
                         </div>
                       </CardContent>
                     </Card>
+                    </motion.div>
                   ))}
-                </div>
+                </motion.div>
               </>
             )}
           </TabsContent>
@@ -1089,9 +1167,15 @@ export function Community() {
               <p className="text-gray-600">Connect with trained peer counselors for support</p>
             </div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <motion.div
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+              className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
+            >
               {peerSupport.map((peer, index) => (
-                <Card key={index} className="hover:shadow-lg transition-shadow">
+                <motion.div key={index} variants={itemVariants}>
+                  <Card className="hover:shadow-xl hover:scale-105 transition-all duration-300 backdrop-blur-sm bg-white/95 border-2">
                   <CardHeader className="text-center">
                     <Avatar className="w-20 h-20 mx-auto mb-4">
                       <AvatarImage src={peer.avatar || undefined} />
@@ -1118,8 +1202,9 @@ export function Community() {
                     </Button>
                   </CardContent>
                 </Card>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
 
             <Card className="bg-green-50 border-green-200">
               <CardContent className="p-6">
@@ -1287,13 +1372,18 @@ export function Community() {
                   <p className="text-gray-600">Join workshops, activities, and discussions</p>
                 </div>
 
-                <div className="space-y-4">
-                  {upcomingEvents.map((event) => (
-                    <Card 
-                      key={event.id} 
-                      className="hover:shadow-md transition-shadow cursor-pointer"
-                      onClick={() => setSelectedEvent(event.id)}
-                    >
+                <motion.div
+                  variants={containerVariants}
+                  initial="hidden"
+                  animate="visible"
+                  className="space-y-4"
+                >
+                  {upcomingEvents.map((event, index) => (
+                    <motion.div key={event.id} variants={itemVariants}>
+                      <Card 
+                        className="hover:shadow-xl hover:scale-[1.02] transition-all duration-300 cursor-pointer backdrop-blur-sm bg-white/95 border-2"
+                        onClick={() => setSelectedEvent(event.id)}
+                      >
                       <CardContent className="p-6">
                         <div className="flex flex-col md:flex-row md:items-center gap-6">
                           <div className="flex-shrink-0 w-20 h-20 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg flex flex-col items-center justify-center text-white">
@@ -1328,8 +1418,9 @@ export function Community() {
                         </div>
                       </CardContent>
                     </Card>
+                    </motion.div>
                   ))}
-                </div>
+                </motion.div>
 
                 <Card className="bg-blue-50 border-blue-200">
                   <CardContent className="p-6">
@@ -1371,7 +1462,7 @@ export function Community() {
                 </div>
 
                 <Tabs defaultValue="joined-groups" className="w-full">
-              <TabsList className="grid w-full max-w-3xl grid-cols-5">
+              <TabsList className="grid w-full max-w-3xl grid-cols-5 bg-white/80 backdrop-blur-sm shadow-md">
                 <TabsTrigger value="joined-groups">
                   <BookmarkCheck className="w-4 h-4 mr-2" />
                   Groups
