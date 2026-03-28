@@ -176,9 +176,8 @@ export function Home() {
               <Link to="/community">
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Button
-                    variant="outline"
                     size="lg"
-                    className="text-lg px-8 py-6 border-2 border-green-300 hover:bg-green-50 shadow-lg"
+                    className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white text-lg px-8 py-6 shadow-xl hover:shadow-2xl transition-all"
                   >
                     <Users className="w-5 h-5 mr-2" />
                     Join Community
