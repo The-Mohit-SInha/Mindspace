@@ -76,10 +76,11 @@ export function Community() {
   useEffect(() => {
     if (user) {
       const displayName = user.isAnonymous ? 'Anonymous User' : user.name;
-      setJoinGroupForm(prev => ({ ...prev, name: displayName, email: user.email }));
-      setScheduleChatForm(prev => ({ ...prev, name: displayName, email: user.email }));
-      setRegisterEventForm(prev => ({ ...prev, name: displayName, email: user.email }));
-      setEventProposalForm(prev => ({ ...prev, contactEmail: user.email }));
+      const displayEmail = user.isAnonymous ? 'anonymous@mindspace.local' : user.email;
+      setJoinGroupForm(prev => ({ ...prev, name: displayName, email: displayEmail }));
+      setScheduleChatForm(prev => ({ ...prev, name: displayName, email: displayEmail }));
+      setRegisterEventForm(prev => ({ ...prev, name: displayName, email: displayEmail }));
+      setEventProposalForm(prev => ({ ...prev, contactEmail: displayEmail }));
     } else {
       // Clear forms when user logs out
       setJoinGroupForm(prev => ({ ...prev, name: '', email: '' }));

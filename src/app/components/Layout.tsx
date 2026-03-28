@@ -83,11 +83,11 @@ export function Layout() {
                   <div className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-purple-50 transition-colors">
                     <Avatar className="w-8 h-8">
                       <AvatarFallback className={`bg-gradient-to-br ${user.avatarColor} text-white text-sm`}>
-                        {user.isAnonymous ? '?' : user.name.charAt(0).toUpperCase()}
+                        {user.name.charAt(0).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                     <span className="text-sm font-medium text-gray-700">
-                      {user.isAnonymous ? 'Anonymous' : user.name.split(' ')[0]}
+                      {user.name.split(' ')[0]}
                     </span>
                   </div>
                 </Link>
@@ -142,12 +142,12 @@ export function Layout() {
                   >
                     <Avatar className="w-8 h-8">
                       <AvatarFallback className={`bg-gradient-to-br ${user.avatarColor} text-white text-sm`}>
-                        {user.isAnonymous ? '?' : user.name.charAt(0).toUpperCase()}
+                        {user.name.charAt(0).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                     <div>
                       <p className="text-sm font-medium text-gray-900">
-                        {user.isAnonymous ? 'Anonymous User' : user.name}
+                        {user.name}
                       </p>
                       <p className="text-xs text-gray-500">View Profile</p>
                     </div>

@@ -42,9 +42,6 @@ export function Profile() {
     navigate('/');
   };
 
-  const displayName = user.isAnonymous ? 'Anonymous User' : user.name;
-  const displayEmail = user.isAnonymous ? 'hidden@anonymous.com' : user.email;
-
   return (
     <div className="w-full">
       {/* Hero Section */}
@@ -111,12 +108,12 @@ export function Profile() {
                 >
                   <Avatar className="w-24 h-24 mx-auto mb-4 ring-4 ring-white shadow-lg">
                     <AvatarFallback className={`bg-gradient-to-br ${user.avatarColor} text-white text-3xl`}>
-                      {user.isAnonymous ? '?' : user.name.charAt(0).toUpperCase()}
+                      {user.name.charAt(0).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                 </motion.div>
-                <CardTitle className="text-2xl font-bold">{displayName}</CardTitle>
-                <CardDescription className="text-base">{displayEmail}</CardDescription>
+                <CardTitle className="text-2xl font-bold">{user.name}</CardTitle>
+                <CardDescription className="text-base">{user.email}</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center justify-between text-sm bg-gray-50 p-3 rounded-lg">
@@ -198,11 +195,11 @@ export function Profile() {
                         <AlertDescription className={user.isAnonymous ? 'text-orange-800' : 'text-blue-800'}>
                           {user.isAnonymous ? (
                             <>
-                              <strong>Anonymous mode is ON.</strong> Your name and email are hidden from others. You'll appear as "Anonymous User" in all interactions.
+                              <strong>Anonymous mode is ON.</strong> Your name and email are hidden from others in community interactions. You'll appear as "Anonymous User" with a protected email address.
                             </>
                           ) : (
                             <>
-                              <strong>Anonymous mode is OFF.</strong> Your name is visible to other users in community interactions.
+                              <strong>Anonymous mode is OFF.</strong> Your name and email are visible to other users in community interactions.
                             </>
                           )}
                         </AlertDescription>
