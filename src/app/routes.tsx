@@ -8,6 +8,7 @@ import { DesignFrames } from "./pages/DesignFrames";
 import { SignIn } from "./pages/SignIn";
 import { SignUp } from "./pages/SignUp";
 import { Profile } from "./pages/Profile";
+import { MoodCalendar } from "./pages/MoodCalendar";
 import { Layout } from "./components/Layout";
 
 export const router = createBrowserRouter([
@@ -29,6 +30,7 @@ export const router = createBrowserRouter([
       { path: "community", Component: Community },
       { path: "crisis", Component: Crisis },
       { path: "profile", Component: Profile },
+      { path: "mood-calendar", Component: MoodCalendar },
       { path: "design-frames", Component: DesignFrames },
     ],
   },

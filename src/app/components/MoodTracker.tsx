@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -14,9 +14,11 @@ import {
 } from 'chart.js';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
-import { Calendar, Sparkles } from 'lucide-react';
+import { Calendar, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
 import localStorageService from '../utils/localStorage';
 import { useAuth } from '../contexts/AuthContext';
+import { toast } from 'sonner';
+import { Link } from 'react-router';
 
 ChartJS.register(
   CategoryScale,
@@ -96,6 +98,7 @@ export function MoodTracker() {
     setNote('');
 
     // Show success message
+    toast.success('Mood recorded! Keep tracking to see your patterns.');
     setTimeout(() => setSelectedMood(null), 2000);
   };
 
@@ -164,6 +167,12 @@ export function MoodTracker() {
             </CardTitle>
             <CardDescription>How are you feeling today?</CardDescription>
           </div>
+          <Link to="/mood-calendar">
+            <Button variant="outline" size="sm" className="hover:bg-purple-50">
+              <Calendar className="w-4 h-4 mr-2" />
+              View Calendar
+            </Button>
+          </Link>
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
