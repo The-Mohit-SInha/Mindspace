@@ -10,15 +10,7 @@ import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { Alert, AlertDescription } from './ui/alert';
-import { 
-  getUserCalendarEvents, 
-  createCalendarEvent, 
-  deleteCalendarEvent,
-  updateCalendarEvent,
-  getCalendarStatistics,
-  type CalendarEvent 
-} from '../../services/calendarService';
-import { isBackendConfigured } from '../../lib/supabase';
+import localStorageService from '../utils/localStorage';
 
 interface UserCalendarProps {
   userId: string;
@@ -30,49 +22,45 @@ const MONTHS = [
 ];
 
 const EVENT_COLORS = {
-  wellness_event: 'bg-purple-100 text-purple-700 border-purple-300',
-  personal: 'bg-blue-100 text-blue-700 border-blue-300',
+  event: 'bg-purple-100 text-purple-700 border-purple-300',
+  task: 'bg-blue-100 text-blue-700 border-blue-300',
   reminder: 'bg-yellow-100 text-yellow-700 border-yellow-300',
   appointment: 'bg-green-100 text-green-700 border-green-300',
 };
 
 const EVENT_TYPE_LABELS = {
-  wellness_event: 'Wellness Event',
-  personal: 'Personal',
+  event: 'Event',
+  task: 'Task',
   reminder: 'Reminder',
   appointment: 'Appointment',
 };
 
 export function UserCalendar({ userId }: UserCalendarProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [events, setEvents] = useState<CalendarEvent[]>([]);
+  const [events, setEvents] = useState<any[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [isAddEventOpen, setIsAddEventOpen] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [statistics, setStatistics] = useState({ totalEvents: 0, upcomingEvents: 0, eventsByType: {} });
+  const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
+  const [isEditMode, setIsEditMode] = useState(false);
 
-  const [newEvent, setNewEvent] = useState({
+  // Form state
+  const [formData, setFormData] = useState({
     title: '',
     description: '',
-    start_date: '',
-    start_time: '09:00',
-    location: '',
-    event_type: 'personal' as const,
-    is_all_day: false,
+    date: '',
+    time: '09:00',
+    type: 'event' as 'event' | 'task' | 'reminder' | 'appointment',
   });
 
+  // Load events
   useEffect(() => {
-    loadCalendarData();
+    loadEvents();
   }, [userId]);
 
-  const loadCalendarData = async () => {
-    setLoading(true);
-    const eventsData = await getUserCalendarEvents(userId);
-    const stats = await getCalendarStatistics(userId);
-    setEvents(eventsData);
-    setStatistics(stats);
-    setLoading(false);
+  const loadEvents = () => {
+    const allEvents = localStorageService.getCalendarEvents();
+    const userEvents = allEvents.filter(e => e.userId === userId);
+    setEvents(userEvents);
   };
 
   const getDaysInMonth = (date: Date) => {
@@ -83,15 +71,27 @@ export function UserCalendar({ userId }: UserCalendarProps) {
     const daysInMonth = lastDay.getDate();
     const startingDayOfWeek = firstDay.getDay();
 
-    return { daysInMonth, startingDayOfWeek, year, month };
+    const days = [];
+    
+    // Add empty slots for days before the first day of the month
+    for (let i = 0; i < startingDayOfWeek; i++) {
+      days.push(null);
+    }
+    
+    // Add all days in the month
+    for (let day = 1; day <= daysInMonth; day++) {
+      days.push(new Date(year, month, day));
+    }
+    
+    return days;
   };
 
   const getEventsForDate = (date: Date) => {
-    const dateString = date.toISOString().split('T')[0];
-    return events.filter(event => event.start_date === dateString);
+    const dateStr = date.toISOString().split('T')[0];
+    return events.filter(e => e.date === dateStr);
   };
 
-  const handlePreviousMonth = () => {
+  const handlePrevMonth = () => {
     setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1));
   };
 
@@ -99,363 +99,359 @@ export function UserCalendar({ userId }: UserCalendarProps) {
     setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1));
   };
 
-  const handleDateClick = (day: number) => {
-    const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+  const handleDateClick = (date: Date) => {
     setSelectedDate(date);
-    setNewEvent({ ...newEvent, start_date: date.toISOString().split('T')[0] });
+    setFormData({
+      ...formData,
+      date: date.toISOString().split('T')[0],
+    });
+    setIsAddEventOpen(true);
   };
 
-  const handleAddEvent = async () => {
-    if (!newEvent.title || !newEvent.start_date) {
-      return;
-    }
-
-    try {
-      await createCalendarEvent(userId, newEvent);
-      await loadCalendarData();
-      setIsAddEventOpen(false);
-      resetNewEvent();
-    } catch (error) {
-      console.error('Failed to add event:', error);
-    }
+  const handleEventClick = (event: any, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedEvent(event);
   };
 
-  const handleDeleteEvent = async (eventId: string) => {
-    try {
-      await deleteCalendarEvent(eventId);
-      await loadCalendarData();
-      setSelectedEvent(null);
-    } catch (error) {
-      console.error('Failed to delete event:', error);
-    }
+  const handleAddEvent = () => {
+    if (!formData.title || !formData.date) return;
+
+    localStorageService.addCalendarEvent({
+      userId,
+      title: formData.title,
+      description: formData.description,
+      date: formData.date,
+      time: formData.time,
+      type: formData.type,
+    });
+
+    loadEvents();
+    setIsAddEventOpen(false);
+    resetForm();
   };
 
-  const resetNewEvent = () => {
-    setNewEvent({
+  const handleEditEvent = () => {
+    if (!selectedEvent || !formData.title) return;
+
+    localStorageService.updateCalendarEvent(selectedEvent.id, {
+      title: formData.title,
+      description: formData.description,
+      time: formData.time,
+      type: formData.type,
+    });
+
+    loadEvents();
+    setSelectedEvent(null);
+    setIsEditMode(false);
+    resetForm();
+  };
+
+  const handleDeleteEvent = (eventId: string) => {
+    localStorageService.deleteCalendarEvent(eventId);
+    loadEvents();
+    setSelectedEvent(null);
+  };
+
+  const resetForm = () => {
+    setFormData({
       title: '',
       description: '',
-      start_date: '',
-      start_time: '09:00',
-      location: '',
-      event_type: 'personal',
-      is_all_day: false,
+      date: '',
+      time: '09:00',
+      type: 'event',
     });
   };
 
-  const { daysInMonth, startingDayOfWeek, year, month } = getDaysInMonth(currentDate);
-  const today = new Date();
-  const isToday = (day: number) => {
-    return day === today.getDate() && 
-           month === today.getMonth() && 
-           year === today.getFullYear();
+  const openEditMode = (event: any) => {
+    setFormData({
+      title: event.title,
+      description: event.description || '',
+      date: event.date,
+      time: event.time || '09:00',
+      type: event.type,
+    });
+    setIsEditMode(true);
   };
 
+  const days = getDaysInMonth(currentDate);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
   return (
-    <div className="space-y-6">
-      {/* Calendar Statistics */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center">
-              <p className="text-3xl font-bold text-purple-600">{statistics.totalEvents}</p>
-              <p className="text-sm text-gray-600 mt-1">Total Events</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center">
-              <p className="text-3xl font-bold text-blue-600">{statistics.upcomingEvents}</p>
-              <p className="text-sm text-gray-600 mt-1">Upcoming Events</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center">
+    <Card className="bg-white/80 backdrop-blur-sm border-2 border-purple-200 shadow-lg">
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <CardTitle className="flex items-center gap-2">
+            <CalendarIcon className="w-5 h-5 text-purple-600" />
+            My Calendar
+          </CardTitle>
+          <Dialog open={isAddEventOpen} onOpenChange={setIsAddEventOpen}>
+            <DialogTrigger asChild>
               <Button 
-                onClick={() => setIsAddEventOpen(true)}
-                className="w-full"
-                size="lg"
+                size="sm" 
+                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+                onClick={() => {
+                  resetForm();
+                  setIsEditMode(false);
+                }}
               >
-                <Plus className="w-4 h-4 mr-2" />
+                <Plus className="w-4 h-4 mr-1" />
                 Add Event
               </Button>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Calendar View */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2">
-              <CalendarIcon className="w-5 h-5" />
-              My Calendar
-            </CardTitle>
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" onClick={handlePreviousMonth}>
-                <ChevronLeft className="w-4 h-4" />
-              </Button>
-              <span className="text-sm font-medium min-w-[150px] text-center">
-                {MONTHS[month]} {year}
-              </span>
-              <Button variant="outline" size="sm" onClick={handleNextMonth}>
-                <ChevronRight className="w-4 h-4" />
-              </Button>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          {/* Calendar Grid */}
-          <div className="grid grid-cols-7 gap-2">
-            {/* Day Headers */}
-            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-              <div key={day} className="text-center text-sm font-medium text-gray-600 py-2">
-                {day}
-              </div>
-            ))}
-
-            {/* Empty cells for days before month starts */}
-            {Array.from({ length: startingDayOfWeek }).map((_, index) => (
-              <div key={`empty-${index}`} className="aspect-square" />
-            ))}
-
-            {/* Calendar days */}
-            {Array.from({ length: daysInMonth }).map((_, index) => {
-              const day = index + 1;
-              const date = new Date(year, month, day);
-              const dayEvents = getEventsForDate(date);
-              const isCurrentDay = isToday(day);
-
-              return (
-                <motion.button
-                  key={day}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => handleDateClick(day)}
-                  className={`
-                    aspect-square p-2 rounded-lg border-2 transition-all
-                    ${isCurrentDay 
-                      ? 'border-purple-500 bg-purple-50' 
-                      : 'border-gray-200 hover:border-purple-300 hover:bg-purple-50'
-                    }
-                  `}
-                >
-                  <div className="text-sm font-medium">{day}</div>
-                  {dayEvents.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mt-1">
-                      {dayEvents.slice(0, 2).map((event, idx) => (
-                        <div
-                          key={idx}
-                          className={`w-2 h-2 rounded-full ${
-                            event.event_type === 'wellness_event' ? 'bg-purple-500' :
-                            event.event_type === 'personal' ? 'bg-blue-500' :
-                            event.event_type === 'reminder' ? 'bg-yellow-500' :
-                            'bg-green-500'
-                          }`}
-                        />
-                      ))}
-                      {dayEvents.length > 2 && (
-                        <div className="text-[10px] text-gray-600">+{dayEvents.length - 2}</div>
-                      )}
-                    </div>
-                  )}
-                </motion.button>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Selected Date Events */}
-      <AnimatePresence>
-        {selectedDate && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-          >
-            <Card>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle>
-                    Events for {selectedDate.toLocaleDateString('en-US', { 
-                      weekday: 'long', 
-                      year: 'numeric', 
-                      month: 'long', 
-                      day: 'numeric' 
-                    })}
-                  </CardTitle>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setSelectedDate(null)}
-                  >
-                    <X className="w-4 h-4" />
-                  </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[500px]">
+              <DialogHeader>
+                <DialogTitle>{isEditMode ? 'Edit Event' : 'Add New Event'}</DialogTitle>
+                <DialogDescription>
+                  {isEditMode ? 'Update your event details' : 'Create a new calendar event'}
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label>Title *</Label>
+                  <Input
+                    value={formData.title}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                    placeholder="Event title"
+                  />
                 </div>
-              </CardHeader>
-              <CardContent>
-                {getEventsForDate(selectedDate).length === 0 ? (
-                  <div className="text-center py-8 text-gray-500">
-                    <CalendarIcon className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                    <p>No events scheduled for this day</p>
-                    <Button 
-                      onClick={() => setIsAddEventOpen(true)}
-                      variant="outline"
-                      size="sm"
-                      className="mt-3"
-                    >
-                      <Plus className="w-4 h-4 mr-2" />
-                      Add Event
-                    </Button>
+                <div className="space-y-2">
+                  <Label>Description</Label>
+                  <Textarea
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    placeholder="Event description"
+                    rows={3}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Date *</Label>
+                    <Input
+                      type="date"
+                      value={formData.date}
+                      onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                    />
                   </div>
-                ) : (
-                  <div className="space-y-3">
-                    {getEventsForDate(selectedDate).map(event => (
-                      <motion.div
-                        key={event.id}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className={`p-4 rounded-lg border-2 ${EVENT_COLORS[event.event_type]}`}
-                      >
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <h4 className="font-medium mb-1">{event.title}</h4>
-                            {event.description && (
-                              <p className="text-sm opacity-80 mb-2">{event.description}</p>
-                            )}
-                            <div className="flex flex-wrap gap-3 text-xs">
-                              <div className="flex items-center gap-1">
-                                <Clock className="w-3 h-3" />
-                                {event.start_time}
-                              </div>
-                              {event.location && (
-                                <div className="flex items-center gap-1">
-                                  <MapPin className="w-3 h-3" />
-                                  {event.location}
-                                </div>
-                              )}
-                              <Badge variant="outline" className="text-xs">
-                                {EVENT_TYPE_LABELS[event.event_type]}
-                              </Badge>
-                            </div>
-                          </div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDeleteEvent(event.id)}
-                            className="text-red-500 hover:text-red-700"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </motion.div>
+                  <div className="space-y-2">
+                    <Label>Time</Label>
+                    <Input
+                      type="time"
+                      value={formData.time}
+                      onChange={(e) => setFormData({ ...formData, time: e.target.value })}
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>Type</Label>
+                  <Select 
+                    value={formData.type} 
+                    onValueChange={(value: any) => setFormData({ ...formData, type: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="event">Event</SelectItem>
+                      <SelectItem value="task">Task</SelectItem>
+                      <SelectItem value="reminder">Reminder</SelectItem>
+                      <SelectItem value="appointment">Appointment</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setIsAddEventOpen(false);
+                    setIsEditMode(false);
+                    resetForm();
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+                  onClick={isEditMode ? handleEditEvent : handleAddEvent}
+                  disabled={!formData.title || !formData.date}
+                >
+                  {isEditMode ? 'Update' : 'Add'} Event
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
+      </CardHeader>
+      <CardContent>
+        {/* Month Navigation */}
+        <div className="flex items-center justify-between mb-6">
+          <Button variant="ghost" size="sm" onClick={handlePrevMonth}>
+            <ChevronLeft className="w-4 h-4" />
+          </Button>
+          <h3 className="text-lg font-semibold">
+            {MONTHS[currentDate.getMonth()]} {currentDate.getFullYear()}
+          </h3>
+          <Button variant="ghost" size="sm" onClick={handleNextMonth}>
+            <ChevronRight className="w-4 h-4" />
+          </Button>
+        </div>
+
+        {/* Calendar Grid */}
+        <div className="grid grid-cols-7 gap-2">
+          {/* Day Headers */}
+          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+            <div key={day} className="text-center text-sm font-medium text-gray-600 py-2">
+              {day}
+            </div>
+          ))}
+
+          {/* Calendar Days */}
+          {days.map((day, index) => {
+            if (!day) {
+              return <div key={`empty-${index}`} className="aspect-square" />;
+            }
+
+            const dayEvents = getEventsForDate(day);
+            const isToday = day.getTime() === today.getTime();
+            const isPast = day < today;
+
+            return (
+              <motion.button
+                key={day.toISOString()}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => handleDateClick(day)}
+                className={`
+                  aspect-square p-2 rounded-lg border-2 transition-all relative
+                  ${isToday ? 'border-purple-500 bg-purple-50' : 'border-gray-200 hover:border-purple-300'}
+                  ${isPast && !isToday ? 'opacity-50' : ''}
+                `}
+              >
+                <div className="text-sm font-medium">{day.getDate()}</div>
+                {dayEvents.length > 0 && (
+                  <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2 flex gap-1">
+                    {dayEvents.slice(0, 3).map((event, i) => (
+                      <div
+                        key={i}
+                        className={`w-1.5 h-1.5 rounded-full ${
+                          event.type === 'event' ? 'bg-purple-500' :
+                          event.type === 'appointment' ? 'bg-green-500' :
+                          event.type === 'reminder' ? 'bg-yellow-500' :
+                          'bg-blue-500'
+                        }`}
+                      />
                     ))}
                   </div>
                 )}
-              </CardContent>
-            </Card>
-          </motion.div>
-        )}
-      </AnimatePresence>
+              </motion.button>
+            );
+          })}
+        </div>
 
-      {/* Add Event Dialog */}
-      <Dialog open={isAddEventOpen} onOpenChange={setIsAddEventOpen}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Add Calendar Event</DialogTitle>
-            <DialogDescription>
-              Create a new event in your calendar
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="title">Event Title *</Label>
-              <Input
-                id="title"
-                value={newEvent.title}
-                onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
-                placeholder="Enter event title"
-              />
-            </div>
-            <div>
-              <Label htmlFor="description">Description</Label>
-              <Textarea
-                id="description"
-                value={newEvent.description}
-                onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
-                placeholder="Add details about the event"
-                rows={3}
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="date">Date *</Label>
-                <Input
-                  id="date"
-                  type="date"
-                  value={newEvent.start_date}
-                  onChange={(e) => setNewEvent({ ...newEvent, start_date: e.target.value })}
-                />
-              </div>
-              <div>
-                <Label htmlFor="time">Time</Label>
-                <Input
-                  id="time"
-                  type="time"
-                  value={newEvent.start_time}
-                  onChange={(e) => setNewEvent({ ...newEvent, start_time: e.target.value })}
-                />
-              </div>
-            </div>
-            <div>
-              <Label htmlFor="location">Location</Label>
-              <Input
-                id="location"
-                value={newEvent.location}
-                onChange={(e) => setNewEvent({ ...newEvent, location: e.target.value })}
-                placeholder="Where is this event?"
-              />
-            </div>
-            <div>
-              <Label htmlFor="type">Event Type</Label>
-              <Select
-                value={newEvent.event_type}
-                onValueChange={(value: any) => setNewEvent({ ...newEvent, event_type: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="personal">Personal</SelectItem>
-                  <SelectItem value="wellness_event">Wellness Event</SelectItem>
-                  <SelectItem value="appointment">Appointment</SelectItem>
-                  <SelectItem value="reminder">Reminder</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex gap-2 pt-4">
-              <Button onClick={handleAddEvent} className="flex-1">
-                <Plus className="w-4 h-4 mr-2" />
-                Add Event
-              </Button>
-              <Button 
-                onClick={() => {
-                  setIsAddEventOpen(false);
-                  resetNewEvent();
-                }}
-                variant="outline"
-                className="flex-1"
-              >
-                Cancel
-              </Button>
+        {/* Upcoming Events */}
+        {events.length > 0 && (
+          <div className="mt-6 space-y-3">
+            <h4 className="font-semibold text-sm text-gray-700">Upcoming Events</h4>
+            <div className="space-y-2 max-h-60 overflow-y-auto">
+              {events
+                .filter(e => new Date(e.date) >= today)
+                .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+                .slice(0, 5)
+                .map((event) => (
+                  <motion.div
+                    key={event.id}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className={`p-3 rounded-lg border ${EVENT_COLORS[event.type as keyof typeof EVENT_COLORS]} cursor-pointer hover:shadow-md transition-shadow`}
+                    onClick={(e) => handleEventClick(event, e)}
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <h5 className="font-medium text-sm">{event.title}</h5>
+                        <div className="flex items-center gap-3 mt-1 text-xs opacity-75">
+                          <span className="flex items-center gap-1">
+                            <CalendarIcon className="w-3 h-3" />
+                            {new Date(event.date).toLocaleDateString()}
+                          </span>
+                          {event.time && (
+                            <span className="flex items-center gap-1">
+                              <Clock className="w-3 h-3" />
+                              {event.time}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <Badge variant="outline" className="text-xs">
+                        {EVENT_TYPE_LABELS[event.type as keyof typeof EVENT_TYPE_LABELS]}
+                      </Badge>
+                    </div>
+                  </motion.div>
+                ))}
             </div>
           </div>
-        </DialogContent>
-      </Dialog>
-    </div>
+        )}
+
+        {/* Event Detail Dialog */}
+        <Dialog open={!!selectedEvent} onOpenChange={() => setSelectedEvent(null)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{selectedEvent?.title}</DialogTitle>
+              <DialogDescription>Event Details</DialogDescription>
+            </DialogHeader>
+            {selectedEvent && (
+              <div className="space-y-4">
+                {selectedEvent.description && (
+                  <div>
+                    <Label>Description</Label>
+                    <p className="text-sm text-gray-600 mt-1">{selectedEvent.description}</p>
+                  </div>
+                )}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>Date</Label>
+                    <p className="text-sm mt-1">{new Date(selectedEvent.date).toLocaleDateString()}</p>
+                  </div>
+                  {selectedEvent.time && (
+                    <div>
+                      <Label>Time</Label>
+                      <p className="text-sm mt-1">{selectedEvent.time}</p>
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <Label>Type</Label>
+                  <Badge className="mt-1">
+                    {EVENT_TYPE_LABELS[selectedEvent.type as keyof typeof EVENT_TYPE_LABELS]}
+                  </Badge>
+                </div>
+                <div className="flex gap-2 pt-4">
+                  <Button
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => {
+                      openEditMode(selectedEvent);
+                      setSelectedEvent(null);
+                      setIsAddEventOpen(true);
+                    }}
+                  >
+                    <Edit2 className="w-4 h-4 mr-2" />
+                    Edit
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    className="flex-1"
+                    onClick={() => handleDeleteEvent(selectedEvent.id)}
+                  >
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Delete
+                  </Button>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+      </CardContent>
+    </Card>
   );
 }

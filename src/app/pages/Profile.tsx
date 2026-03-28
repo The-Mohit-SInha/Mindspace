@@ -1,7 +1,17 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router';
+import { useAuth } from '../contexts/AuthContext';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Label } from '../components/ui/label';
+import { Avatar, AvatarFallback } from '../components/ui/avatar';
+import { Alert, AlertDescription } from '../components/ui/alert';
+import { Badge } from '../components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { User, Mail, Calendar, Shield, ShieldOff, LogOut, Edit2, Save, X, Eye, EyeOff, Info } from 'lucide-react';
 import { UserCalendar } from '../components/UserCalendar';
 import { BackupSettings } from '../components/BackupSettings';
-import { isBackendConfigured } from '../../lib/supabase';
 import { motion } from 'motion/react';
 
 export function Profile() {

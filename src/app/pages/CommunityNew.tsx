@@ -15,7 +15,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from '../components/ui/label';
 import { Alert, AlertDescription } from '../components/ui/alert';
 import { useAuth } from '../contexts/AuthContext';
-import { addWellnessEventToCalendar, isEventInCalendar } from '../../services/calendarService';
+import localStorageService from '../utils/localStorage';
 import { toast } from 'sonner';
 
 export function Community() {
@@ -80,12 +80,21 @@ export function Community() {
       setScheduleChatForm(prev => ({ ...prev, name: displayName, email: user.email }));
       setRegisterEventForm(prev => ({ ...prev, name: displayName, email: user.email }));
       setEventProposalForm(prev => ({ ...prev, contactEmail: user.email }));
+    } else {
+      // Clear forms when user logs out
+      setJoinGroupForm(prev => ({ ...prev, name: '', email: '' }));
+      setScheduleChatForm(prev => ({ ...prev, name: '', email: '' }));
+      setRegisterEventForm(prev => ({ ...prev, name: '', email: '' }));
+      setEventProposalForm(prev => ({ ...prev, contactEmail: '' }));
     }
   }, [user]);
 
   // Helper to check authentication before action
   const requireAuth = (action: () => void) => {
     if (!isAuthenticated) {
+      toast.error('Please sign in to continue', {
+        description: 'You need to be signed in to access this feature.',
+      });
       navigate('/sign-in');
       return;
     }
@@ -202,19 +211,21 @@ export function Community() {
       const timeStr = event.time.split(' - ')[0]; // Get start time
       const time24 = convertTo24Hour(timeStr);
 
-      await addWellnessEventToCalendar(
-        user.id,
-        String(eventId),
-        event.title,
-        `Join us for this ${event.type.toLowerCase()} event at ${event.location}`,
-        dateStr,
-        time24,
-        event.location
-      );
+      // Add to calendar using localStorage
+      localStorageService.addCalendarEvent({
+        userId: user.id,
+        title: event.title,
+        description: `Join us for this ${event.type.toLowerCase()} event at ${event.location}`,
+        date: dateStr,
+        time: time24,
+        type: 'event',
+      });
 
       setEventInCalendar({ ...eventInCalendar, [eventId]: true });
+      toast.success('Event added to your calendar!');
     } catch (error) {
       console.error('Failed to add to calendar:', error);
+      toast.error('Failed to add event to calendar');
     }
   };
 
@@ -948,7 +959,7 @@ export function Community() {
                           className="w-full"
                           onClick={(e) => {
                             e.stopPropagation();
-                            setJoinGroupModal(group.id);
+                            requireAuth(() => setJoinGroupModal(group.id));
                           }}
                         >
                           <UserPlus className="w-4 h-4 mr-2" />
@@ -1410,7 +1421,7 @@ export function Community() {
                             className="w-full md:w-auto"
                             onClick={(e) => {
                               e.stopPropagation();
-                              setRegisterEventModal(event.id);
+                              requireAuth(() => setRegisterEventModal(event.id));
                             }}
                           >
                             Register
@@ -1706,29 +1717,34 @@ export function Community() {
           <DialogHeader>
             <DialogTitle>Join Support Group</DialogTitle>
             <DialogDescription>
-              Fill out the form below to join {joinGroupModal && groupDetails[joinGroupModal] ? `the ${groupDetails[joinGroupModal].name}` : 'this'} support group.
+              {isAuthenticated 
+                ? `Your name and email are automatically filled from your profile. Fill out the form to join ${joinGroupModal && groupDetails[joinGroupModal] ? `the ${groupDetails[joinGroupModal].name}` : 'this'} support group.`
+                : `Fill out the form below to join ${joinGroupModal && groupDetails[joinGroupModal] ? `the ${groupDetails[joinGroupModal].name}` : 'this'} support group.`
+              }
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="name">Name {isAuthenticated && <span className="text-xs text-gray-500">(from your profile)</span>}</Label>
               <Input
                 id="name"
                 placeholder="Your name"
                 value={joinGroupForm.name}
                 onChange={(e) => setJoinGroupForm({ ...joinGroupForm, name: e.target.value })}
-                disabled
+                disabled={isAuthenticated}
+                className={isAuthenticated ? 'bg-gray-50' : ''}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">Email {isAuthenticated && <span className="text-xs text-gray-500">(from your profile)</span>}</Label>
               <Input
                 id="email"
                 type="email"
                 placeholder="Your email"
                 value={joinGroupForm.email}
                 onChange={(e) => setJoinGroupForm({ ...joinGroupForm, email: e.target.value })}
-                disabled
+                disabled={isAuthenticated}
+                className={isAuthenticated ? 'bg-gray-50' : ''}
               />
             </div>
             <div className="space-y-2">
@@ -1800,29 +1816,34 @@ export function Community() {
           <DialogHeader>
             <DialogTitle>Schedule Chat with Peer Counselor</DialogTitle>
             <DialogDescription>
-              Schedule a chat with {scheduleChatModal?.name} for {scheduleChatModal?.specialty} support.
+              {isAuthenticated 
+                ? `Your name and email are automatically filled from your profile. Schedule a chat with ${scheduleChatModal?.name} for ${scheduleChatModal?.specialty} support.`
+                : `Schedule a chat with ${scheduleChatModal?.name} for ${scheduleChatModal?.specialty} support.`
+              }
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="name">Name {isAuthenticated && <span className="text-xs text-gray-500">(from your profile)</span>}</Label>
               <Input
                 id="name"
                 placeholder="Your name"
                 value={scheduleChatForm.name}
                 onChange={(e) => setScheduleChatForm({ ...scheduleChatForm, name: e.target.value })}
-                disabled
+                disabled={isAuthenticated}
+                className={isAuthenticated ? 'bg-gray-50' : ''}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">Email {isAuthenticated && <span className="text-xs text-gray-500">(from your profile)</span>}</Label>
               <Input
                 id="email"
                 type="email"
                 placeholder="Your email"
                 value={scheduleChatForm.email}
                 onChange={(e) => setScheduleChatForm({ ...scheduleChatForm, email: e.target.value })}
-                disabled
+                disabled={isAuthenticated}
+                className={isAuthenticated ? 'bg-gray-50' : ''}
               />
             </div>
             <div className="space-y-2">
@@ -1866,29 +1887,34 @@ export function Community() {
           <DialogHeader>
             <DialogTitle>Register for Event</DialogTitle>
             <DialogDescription>
-              Register for {registerEventModal && eventDetails[registerEventModal] ? `the ${eventDetails[registerEventModal].title}` : 'this'} event.
+              {isAuthenticated 
+                ? `Your name and email are automatically filled from your profile. Register for ${registerEventModal && eventDetails[registerEventModal] ? `the ${eventDetails[registerEventModal].title}` : 'this'} event.`
+                : `Register for ${registerEventModal && eventDetails[registerEventModal] ? `the ${eventDetails[registerEventModal].title}` : 'this'} event.`
+              }
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="name">Name {isAuthenticated && <span className="text-xs text-gray-500">(from your profile)</span>}</Label>
               <Input
                 id="name"
                 placeholder="Your name"
                 value={registerEventForm.name}
                 onChange={(e) => setRegisterEventForm({ ...registerEventForm, name: e.target.value })}
-                disabled
+                disabled={isAuthenticated}
+                className={isAuthenticated ? 'bg-gray-50' : ''}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">Email {isAuthenticated && <span className="text-xs text-gray-500">(from your profile)</span>}</Label>
               <Input
                 id="email"
                 type="email"
                 placeholder="Your email"
                 value={registerEventForm.email}
                 onChange={(e) => setRegisterEventForm({ ...registerEventForm, email: e.target.value })}
-                disabled
+                disabled={isAuthenticated}
+                className={isAuthenticated ? 'bg-gray-50' : ''}
               />
             </div>
             <div className="space-y-2">
@@ -1914,7 +1940,10 @@ export function Community() {
           <DialogHeader>
             <DialogTitle>Submit Event Proposal</DialogTitle>
             <DialogDescription>
-              Propose a new mental health event or workshop for the community.
+              {isAuthenticated 
+                ? 'Your contact email is automatically filled from your profile. Propose a new mental health event or workshop for the community.'
+                : 'Propose a new mental health event or workshop for the community.'
+              }
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
@@ -1937,14 +1966,15 @@ export function Community() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="contactEmail">Contact Email</Label>
+              <Label htmlFor="contactEmail">Contact Email {isAuthenticated && <span className="text-xs text-gray-500">(from your profile)</span>}</Label>
               <Input
                 id="contactEmail"
                 type="email"
                 placeholder="Your email"
                 value={eventProposalForm.contactEmail}
                 onChange={(e) => setEventProposalForm({ ...eventProposalForm, contactEmail: e.target.value })}
-                disabled
+                disabled={isAuthenticated}
+                className={isAuthenticated ? 'bg-gray-50' : ''}
               />
             </div>
             <div className="space-y-2">
