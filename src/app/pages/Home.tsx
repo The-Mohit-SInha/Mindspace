@@ -150,17 +150,6 @@ export function Home() {
               transition={{ delay: 0.7, duration: 0.8 }}
               className="flex flex-col sm:flex-row gap-4 justify-center"
             >
-              <Link to="/assessment">
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Button
-                    size="lg"
-                    className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-lg px-8 py-6 shadow-xl hover:shadow-2xl transition-all"
-                  >
-                    <ClipboardList className="w-5 h-5 mr-2" />
-                    Start Assessment
-                  </Button>
-                </motion.div>
-              </Link>
               <Link to="/resources">
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Button
@@ -169,6 +158,17 @@ export function Home() {
                   >
                     <BookOpen className="w-5 h-5 mr-2" />
                     Browse Resources
+                  </Button>
+                </motion.div>
+              </Link>
+              <Link to="/assessment">
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Button
+                    size="lg"
+                    className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-lg px-8 py-6 shadow-xl hover:shadow-2xl transition-all"
+                  >
+                    <ClipboardList className="w-5 h-5 mr-2" />
+                    Start Assessment
                   </Button>
                 </motion.div>
               </Link>
