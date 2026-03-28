@@ -195,7 +195,7 @@ export function Home() {
               className="mt-16 grid grid-cols-3 gap-8 max-w-2xl mx-auto"
             >
               {[
-                { number: '10K+', label: 'Active Users' },
+                { number: '500+', label: 'Active Users' },
                 { number: '50+', label: 'Support Groups' },
                 { number: '24/7', label: 'Availability' },
               ].map((stat, idx) => (
