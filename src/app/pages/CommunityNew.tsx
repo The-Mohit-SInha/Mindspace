@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { motion } from 'motion/react';
-import { Users, MessageCircle, Heart, Calendar, UserPlus, Search, ArrowLeft, Send, MapPin, Clock, ThumbsUp, CheckCircle, BookmarkCheck, FileText, CalendarCheck, ClipboardCheck, Sparkles } from 'lucide-react';
+import { Users, MessageCircle, Heart, Calendar, UserPlus, Search, ArrowLeft, Send, MapPin, Clock, ThumbsUp, CheckCircle, BookmarkCheck, FileText, CalendarCheck, ClipboardCheck, Sparkles, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -17,6 +17,18 @@ import { Alert, AlertDescription } from '../components/ui/alert';
 import { useAuth } from '../contexts/AuthContext';
 import { addWellnessEventToCalendar, isEventInCalendar } from '../../services/calendarService';
 import { toast } from 'sonner';
+import { isBackendConfigured } from '../../lib/supabase';
+import { 
+  getAllSupportGroups, 
+  getAllForumTopics, 
+  getAllEvents,
+  joinSupportGroup,
+  createForumTopic,
+  registerForEvent,
+  type SupportGroup,
+  type ForumTopic,
+  type Event 
+} from '../../services/communityService';
 
 export function Community() {
   const navigate = useNavigate();
@@ -49,6 +61,38 @@ export function Community() {
   const [myRegisteredEvents, setMyRegisteredEvents] = useState<Array<{ id: number; title: string; date: string; time: string; location: string; type: string }>>([]);
   const [myEventProposals, setMyEventProposals] = useState<Array<{ id: number; title: string; orgName: string; date: string; status: string; submittedDate: string }>>([]);
   const [eventInCalendar, setEventInCalendar] = useState<Record<number, boolean>>({});
+
+  // Backend data states
+  const [backendGroups, setBackendGroups] = useState<SupportGroup[]>([]);
+  const [backendTopics, setBackendTopics] = useState<ForumTopic[]>([]);
+  const [backendEvents, setBackendEvents] = useState<Event[]>([]);
+  const [dataLoading, setDataLoading] = useState(false);
+
+  // Load backend data on mount
+  useEffect(() => {
+    loadCommunityData();
+  }, []);
+
+  const loadCommunityData = async () => {
+    if (!isBackendConfigured) return;
+    
+    setDataLoading(true);
+    try {
+      const [groups, topics, events] = await Promise.all([
+        getAllSupportGroups(),
+        getAllForumTopics(),
+        getAllEvents(),
+      ]);
+      
+      if (groups) setBackendGroups(groups);
+      if (topics) setBackendTopics(topics);
+      if (events) setBackendEvents(events);
+    } catch (error) {
+      console.error('Failed to load community data:', error);
+    } finally {
+      setDataLoading(false);
+    }
+  };
 
   // Animation variants
   const containerVariants = {
@@ -93,10 +137,19 @@ export function Community() {
   };
 
   // Handler functions
-  const handleJoinGroup = () => {
+  const handleJoinGroup = async () => {
     if (joinGroupModal && joinGroupForm.name && joinGroupForm.email) {
       const group = supportGroups.find(g => g.id === joinGroupModal);
       if (group) {
+        // If backend is configured and user is authenticated, save to database
+        if (isBackendConfigured && user) {
+          try {
+            await joinSupportGroup(user.id, String(group.id));
+          } catch (error) {
+            console.error('Failed to join group:', error);
+          }
+        }
+
         const newJoinedGroup = {
           id: joinGroupModal,
           name: group.name,
@@ -113,8 +166,24 @@ export function Community() {
     }
   };
 
-  const handleCreateTopic = () => {
+  const handleCreateTopic = async () => {
     if (newTopicForm.title && newTopicForm.content) {
+      // If backend is configured and user is authenticated, save to database
+      if (isBackendConfigured && user) {
+        try {
+          await createForumTopic({
+            user_id: user.id,
+            title: newTopicForm.title,
+            category: newTopicForm.category,
+            content: newTopicForm.content,
+          });
+          // Reload community data to get the new topic
+          await loadCommunityData();
+        } catch (error) {
+          console.error('Failed to create topic:', error);
+        }
+      }
+
       const newTopic = {
         id: Date.now(),
         title: newTopicForm.title,
@@ -148,10 +217,19 @@ export function Community() {
     }
   };
 
-  const handleRegisterEvent = () => {
+  const handleRegisterEvent = async () => {
     if (registerEventModal && registerEventForm.name && registerEventForm.email) {
-      const event = eventDetails[registerEventModal];
+      const event = upcomingEvents.find(e => e.id === registerEventModal);
       if (event) {
+        // If backend is configured and user is authenticated, save to database
+        if (isBackendConfigured && user) {
+          try {
+            await registerForEvent(user.id, String(event.id));
+          } catch (error) {
+            console.error('Failed to register for event:', error);
+          }
+        }
+
         const newRegistration = {
           id: registerEventModal,
           title: event.title,
@@ -234,7 +312,40 @@ export function Community() {
     return `${hours.padStart(2, '0')}:${minutes || '00'}`;
   };
 
-  const supportGroups = [
+  // Helper function to get category color
+  const getCategoryColor = (category: string) => {
+    const colors: Record<string, string> = {
+      'Anxiety': 'bg-blue-100 text-blue-700',
+      'Depression': 'bg-purple-100 text-purple-700',
+      'Student Life': 'bg-green-100 text-green-700',
+      'Wellness': 'bg-pink-100 text-pink-700',
+      'Identity': 'bg-orange-100 text-orange-700',
+      'Academic': 'bg-yellow-100 text-yellow-700',
+      'Grief': 'bg-indigo-100 text-indigo-700',
+      'Relationships': 'bg-cyan-100 text-cyan-700',
+    };
+    return colors[category] || 'bg-gray-100 text-gray-700';
+  };
+
+  // Smart function that uses backend data when available
+  const getSupportGroups = () => {
+    if (isBackendConfigured && backendGroups.length > 0) {
+      return backendGroups.map(group => ({
+        id: parseInt(group.id),
+        name: group.name,
+        description: group.description,
+        members: group.member_count || 0,
+        category: group.category,
+        meetingTime: group.meeting_time,
+        color: getCategoryColor(group.category),
+      }));
+    }
+    
+    // Otherwise use mock data
+    return mockSupportGroups;
+  };
+
+  const mockSupportGroups = [
     {
       id: 1,
       name: 'Anxiety Support Circle',
@@ -291,7 +402,27 @@ export function Community() {
     },
   ];
 
-  const forumTopics = [
+  const supportGroups = getSupportGroups();
+
+  // Smart function for forum topics
+  const getForumTopics = () => {
+    if (isBackendConfigured && backendTopics.length > 0) {
+      return backendTopics.map(topic => ({
+        id: parseInt(topic.id),
+        title: topic.title,
+        author: 'Anonymous User',
+        replies: topic.reply_count || 0,
+        likes: topic.like_count || 0,
+        category: topic.category,
+        timestamp: new Date(topic.created_at).toLocaleDateString(),
+        content: topic.content,
+      }));
+    }
+    
+    return mockForumTopics;
+  };
+
+  const mockForumTopics = [
     {
       id: 1,
       title: 'How do you manage test anxiety?',
@@ -654,7 +785,28 @@ export function Community() {
     },
   ];
 
-  const upcomingEvents = [
+  const forumTopics = getForumTopics();
+
+  // Smart function for events
+  const getUpcomingEvents = () => {
+    if (isBackendConfigured && backendEvents.length > 0) {
+      return backendEvents.map(event => ({
+        id: parseInt(event.id),
+        title: event.title,
+        description: event.description,
+        date: event.date,
+        time: event.time,
+        location: event.location,
+        type: event.event_type,
+        spots: event.max_participants || 50,
+        registered: event.registered_count || 0,
+      }));
+    }
+    
+    return mockUpcomingEvents;
+  };
+
+  const mockUpcomingEvents = [
     {
       id: 1,
       title: 'Mental Health Awareness Workshop',
@@ -680,6 +832,8 @@ export function Community() {
       type: 'Panel',
     },
   ];
+
+  const upcomingEvents = getUpcomingEvents();
 
   return (
     <div className="w-full">
@@ -726,6 +880,16 @@ export function Community() {
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-3xl -z-0"></div>
         <div className="absolute bottom-0 left-0 w-80 h-80 bg-teal-500/20 rounded-full blur-3xl -z-0"></div>
       </section>
+
+      {/* Loading Indicator */}
+      {dataLoading && isBackendConfigured && (
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+          <div className="flex justify-center items-center py-12">
+            <Loader2 className="w-8 h-8 animate-spin text-green-600" />
+            <span className="ml-3 text-gray-600">Loading community data...</span>
+          </div>
+        </section>
+      )}
 
       {/* Featured Image */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8">

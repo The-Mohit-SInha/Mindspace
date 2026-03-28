@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { ClipboardList, AlertCircle, CheckCircle2, Brain, Heart, Activity, ArrowRight, BookOpen, Users, Phone, Sparkles, Shield } from 'lucide-react';
+import { ClipboardList, AlertCircle, CheckCircle2, Brain, Heart, Activity, ArrowRight, BookOpen, Users, Phone, Sparkles, Shield, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { RadioGroup, RadioGroupItem } from '../components/ui/radio-group';
@@ -9,6 +9,10 @@ import { Progress } from '../components/ui/progress';
 import { Alert, AlertDescription } from '../components/ui/alert';
 import { Link } from 'react-router';
 import { Separator } from '../components/ui/separator';
+import { isBackendConfigured } from '../../lib/supabase';
+import { submitAssessmentResult } from '../../services/assessmentService';
+import { useAuth } from '../contexts/AuthContext';
+import { toast } from 'sonner';
 
 type AssessmentType = 'anxiety' | 'depression' | 'stress' | null;
 
@@ -19,10 +23,12 @@ interface Question {
 }
 
 export function Assessment() {
+  const { user } = useAuth();
   const [selectedAssessment, setSelectedAssessment] = useState<AssessmentType>(null);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<Record<string, number>>({});
   const [showResults, setShowResults] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -635,6 +641,36 @@ export function Assessment() {
       }
     };
 
+    const handleSaveResults = async () => {
+      if (!user) {
+        toast.error('Please log in to save your assessment results.');
+        return;
+      }
+
+      if (!isBackendConfigured) {
+        toast.error('Backend configuration is missing. Please contact support.');
+        return;
+      }
+
+      setSaving(true);
+      try {
+        await submitAssessmentResult(
+          user.id,
+          selectedAssessment, // assessment_id
+          score,
+          answers,
+          result.severity,
+          result.recommendations
+        );
+        toast.success('Assessment results saved successfully.');
+      } catch (error) {
+        console.error('Failed to save assessment:', error);
+        toast.error('Failed to save assessment results.');
+      } finally {
+        setSaving(false);
+      }
+    };
+
     return (
       <div className="w-full">
         <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -776,6 +812,18 @@ export function Assessment() {
                 </Button>
                 <Button variant="outline" className="flex-1" asChild>
                   <Link to="/community">Find Support</Link>
+                </Button>
+                <Button
+                  variant="outline"
+                  className="flex-1"
+                  onClick={handleSaveResults}
+                  disabled={saving}
+                >
+                  {saving ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    'Save Results'
+                  )}
                 </Button>
               </div>
 

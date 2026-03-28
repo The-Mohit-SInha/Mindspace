@@ -4,10 +4,18 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 
+// Log configuration status for debugging
+console.log('🔍 Supabase Configuration Check:');
+console.log('  URL exists:', !!supabaseUrl);
+console.log('  Key exists:', !!supabaseAnonKey);
+console.log('  URL value:', supabaseUrl ? `${supabaseUrl.substring(0, 20)}...` : 'NOT SET');
+
 // Check if Supabase is configured
 const isSupabaseConfigured = supabaseUrl && supabaseAnonKey && 
   supabaseUrl !== 'YOUR_SUPABASE_URL' && 
   supabaseAnonKey !== 'YOUR_SUPABASE_ANON_KEY';
+
+console.log('  ✅ Backend Status:', isSupabaseConfigured ? 'CONNECTED' : 'DEMO MODE');
 
 // Create a dummy client if not configured (for development)
 const createSupabaseClient = () => {
